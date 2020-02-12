@@ -9,11 +9,11 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 
 
 ## Conceptual Pipeline:
-1_ mySequences (collection of my sequences in FASTA format)
-2_ generation of DB of mySequences = mySequencesDB
-3_ Run BLASTP or BLASTN on mySequencesDB with query mySequences 
-4_ Convert the output file to a CLANS or GEPHI readable format.
-5_ Proceed with the analysis through the software package. 
+1. mySequences (collection of my sequences in FASTA format)
+2. generation of DB of mySequences = mySequencesDB
+3. Run BLASTP or BLASTN on mySequencesDB with query mySequences 
+4. Convert the output file to a CLANS or GEPHI readable format.
+5. Proceed with the analysis through the software package. 
 
 
 ## Installation steps:
