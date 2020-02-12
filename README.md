@@ -1,5 +1,5 @@
 # BLASTnet
-:This python project implements a fully automated pipeline that allows to perform a BLAST ALL search, gives as output a cst file with the results of the BLASTALL run and generats network graphs that can be further analised with the software package CLANS or GEPHI. 
+This python project implements a fully automated pipeline that allows to perform a BLAST ALL search, gives as output a cst file with the results of the BLASTALL run and generats network graphs that can be further analised with the software package CLANS or GEPHI. 
 The network graphs are in intermediate step to a network graph analysis that allows to take be similarities between sequences and cluster them by their similarities in groups. 
 
 
