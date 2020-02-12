@@ -30,20 +30,22 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 ## How to run this tool
 The script I’ve made for you (blastnet.py) comprises the full pipeline from a to d. 
 
-'python blastnet.py mySequences.fasta -info'
+	
+`python blastnet.py mySequences.fasta -info`
 
 If the database is present it will use that, otherwise it will generate it. 
 If the -p (protein) flag is used the script will perform a BLASTP analysis.
 
-'python blastnet.py mySequences.fasta -p' 
+	
+`python blastnet.py mySequences.fasta -p`
 
 If the -n (nucleotide) flag is used the script will perform a BLASTN analysis.
 
-'python blastnet.py mySequences.fasta -n'
+`python blastnet.py mySequences.fasta -n`
 
 If -eval (evalue) flag is set the user can specify a value for the blast analysis, otherwise it will use the default value of: --- . 
 
-'python blastnet.py mySequences.fasta -n -eval “1E-10”' 
+`python blastnet.py mySequences.fasta -n -eval “1E-10”` 
 
 
 The script will process the data, create a folder with the same name of mySequence.fasta, and place there all the run files + results. The results will be the output of  .gephi and .clans file. 
