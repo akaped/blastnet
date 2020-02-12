@@ -17,8 +17,8 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 
 
 ## Installation steps:
-- For running this script:
-* Clone this repo: 
+- For running this script: 
+* Clone this repo: `git@github.com:akaped/blastnet.git`
 * Install the right BLAST+ package for your system
   ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
 * Be sure to have Python3 and pip installed
@@ -28,7 +28,7 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 * GEPHI (https://gephi.org/) 
 
 ## How to run this tool
-The script I’ve made for you (blastnet.py) comprises the full pipeline from a to d. 
+The script I’ve made for you (blastnet.py) comprises the full pipeline from *1* to *4*. 
 
 	
 `python blastnet.py mySequences.fasta -info`
@@ -51,7 +51,7 @@ If -eval (evalue) flag is set the user can specify a value for the blast analysi
 The script will process the data, create a folder with the same name of mySequence.fasta, and place there all the run files + results. The results will be the output of  .gephi and .clans file. 
 
 This is the output structure of the generated folder:
-
+`
 mySequence 
 |     |     | 
 |     |     |_ runfiles
@@ -59,4 +59,4 @@ mySequence
 |     |         |____mySequences.db*
 |     |____results
 |_______report.txt
-
+`
