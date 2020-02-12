@@ -52,7 +52,7 @@ The script will process the data, create a folder with the same name of mySequen
 
 This is the output structure of the generated folder:
 ```
-mySequence 
+mySequences
 |  
 |__ runfiles
 |   |__mySequences.fasta 
