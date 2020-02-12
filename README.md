@@ -51,7 +51,7 @@ If -eval (evalue) flag is set the user can specify a value for the blast analysi
 The script will process the data, create a folder with the same name of mySequence.fasta, and place there all the run files + results. The results will be the output of  .gephi and .clans file. 
 
 This is the output structure of the generated folder:
-`
+```
 mySequence 
 |     |     | 
 |     |     |_ runfiles
@@ -59,4 +59,4 @@ mySequence
 |     |         |____mySequences.db*
 |     |____results
 |_______report.txt
-`
+```
