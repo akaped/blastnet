@@ -160,6 +160,5 @@ def generateNetwork(inputf):
     fjson = open("{}.cytoscape".format(of),"w")
     fjson.write(convert2cytoscapeJSON(G))
     fjson.close()
-    exit()
     
     

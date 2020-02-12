@@ -1,8 +1,8 @@
 import argparse
 from shutil import copyfile
 from os import path, mkdir, system
-from network import generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
-from blast_to_clans import generateClans
+from libraries.network import generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
+from libraries.blast_to_clans import generateClans
 
 def banner():
     print("""
@@ -27,12 +27,13 @@ def banner():
 
 def makedb(fp,fn,runp,magicletter):
     try:
+        print("GENERATING DB - START")
         if magicletter == "n":
             cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype nucl ".format(fp,runp,fn)
         elif magicletter == "p":
             cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype prot ".format(fp,runp,fn)
-        print(cmd)
         system(cmd)
+        print("GENERATING DB - END\n")
     except:
         print("! ERROR WHILE MAKING DB")
         exit()
@@ -99,6 +100,7 @@ def blastit(cmd):
     try:
         print("* Running BLAST")
         system(cmd)
+        print("* END Blast RUN")
     except:
         print("! ERROR RUNNING BLAST")
         
@@ -123,8 +125,10 @@ if __name__ == "__main__":
     blastit(cmd)
     bf = rp + "/" + fn + ".tsv" #blast file    
     generateNetwork(bf)
+    print("* GEPHI + CYTOSCAPE FILES GENERATED")
     generateClans(bf)
+    print("* CLANS FILES GENERATED")
+
     
 
 
-    # pip install networkx sklearn fa2 matplotlib
