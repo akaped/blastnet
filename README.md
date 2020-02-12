@@ -17,13 +17,13 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 
 
 ## Installation steps:
-- For running this script: 
+**For running this script: **
 * Clone this repo: `git@github.com:akaped/blastnet.git`
 * Install the right BLAST+ package for your system
   ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
 * Be sure to have Python3 and pip installed
 * install all the python dependencies python complains about
-- For the graphical analysis:
+**For the graphical analysis:**
 * CLANS software (https://www.eb.tuebingen.mpg.de/protein-evolution/software/clans/)
 * GEPHI (https://gephi.org/) 
 
