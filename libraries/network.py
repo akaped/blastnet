@@ -78,9 +78,6 @@ def removeSelfHit(df):
         
     df = df.drop(df.index[to_drop])
     print("len of the dataframe after cleaning: " + str(len(df)))
-    if len(df) == 0:
-        print("NO DATA - QUITTING")
-        exit()
     print("Removing Self Hits - Finish")
     return(df)
 
@@ -101,9 +98,6 @@ def mergeHits(df):
     aggregation_functions = {'eval': 'median',}
     df_new = df.groupby(df['node1','node2']).aggregate(aggregation_functions)
     print("len of the dataframe after cleaning: " + str(len(df)))
-    if len(df) == 0:
-        print("NO DATA - QUITTING")
-        exit()
     print("Merging - Finish")
     return(df_new)
 
@@ -148,17 +142,25 @@ def generateNetwork(inputf):
     expname = inputf.split(".")[0]
     df = loadData(inputf)
     df = removeSelfHit(df)
-    df = removeDuplicates(df)
-    #df = mergeHits(df)
-    df = evalToForce(df)
-    df = normalize(df)
-    G = networkxLoad(df)
-    # write the GML file for Gephi
-    of = path.abspath(inputf).split(".")[0] 
-    nx.write_gml(G,"{}.gml".format(of))
-    # write json file for Cytoscape
-    fjson = open("{}.cytoscape".format(of),"w")
-    fjson.write(convert2cytoscapeJSON(G))
-    fjson.close()
+    if len(df) == 0:
+        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephy/cytoscape network")
+        pass
+    else:
+        df = removeDuplicates(df)
+    if len(df) == 0:
+        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephy/cytoscape network")
+        pass
+    else:
+        #df = mergeHits(df)
+        df = evalToForce(df)
+        df = normalize(df)
+        G = networkxLoad(df)
+        # write the GML file for Gephi
+        of = path.abspath(inputf).split(".")[0] 
+        nx.write_gml(G,"{}.gml".format(of))
+        # write json file for Cytoscape
+        fjson = open("{}.cytoscape".format(of),"w")
+        fjson.write(convert2cytoscapeJSON(G))
+        fjson.close()
     
     
