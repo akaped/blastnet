@@ -1,5 +1,5 @@
 # BLASTnet
-This python project implements a fully automated pipeline that allows to perform a BLAST ALL search, gives as output a cst file with the results of the BLASTALL run and generats network graphs that can be further analised with the software package CLANS or GEPHI. 
+This python project implements a fully automated pipeline that allows to perform a BLAST ALL search, gives as output a cst file with the results of the BLASTALL run and generats network graphs that can be further analised with the software package CLANS, GEPHI and CYTOSCAPE. 
 The network graphs are in intermediate step to a network graph analysis that allows to take be similarities between sequences and cluster them by their similarities in groups. 
 
 
@@ -12,7 +12,7 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 1. mySequences (collection of my sequences in FASTA format)
 2. generation of DB of mySequences = mySequencesDB
 3. Run BLASTP or BLASTN on mySequencesDB with query mySequences 
-4. Convert the output file to a CLANS or GEPHI readable format.
+4. Convert the output file to a CLANS, GEPHI and CYTOSCAPE readable format.
 5. Proceed with the analysis through the software package. 
 
 
@@ -26,6 +26,7 @@ BLAST is known as "basic local alignment search tool" it allows to search a data
 **For the graphical analysis:**
 * CLANS software (https://www.eb.tuebingen.mpg.de/protein-evolution/software/clans/)
 * GEPHI (https://gephi.org/) 
+* CYTOSCAPE (https://cytoscape.org/)
 
 ## How to run this tool
 The script I’ve made for you (blastnet.py) comprises the full pipeline from *1* to *4*. 
@@ -48,7 +49,7 @@ If -eval (evalue) flag is set the user can specify a value for the blast analysi
 `python blastnet.py mySequences.fasta -n -eval “1E-10”` 
 
 
-The script will process the data, create a folder with the same name of mySequence.fasta, and place there all the run files + results. The results will be the output of  .gephi and .clans file. 
+The script will process the data, create a folder with the same name of mySequence.fasta, and place there all the run files + results. The results will be the output of  .gephi, .cytoscape and .clans file. 
 
 This is the output structure of the generated folder:
 ```
@@ -61,6 +62,7 @@ mySequences
 |__results
 |   |__ mySequences.gephi
 |   |__ mySequences.clans
+|   |__ mySequences.cytoscape
 |   |__ mySequences.tsv
 |
 |__report.txt
