@@ -43,7 +43,7 @@ If the -n (nucleotide) flag is used the script will perform a BLASTN analysis.
 
 `python blastnet.py mySequences.fasta -n`
 
-If -eval (evalue) flag is set the user can specify a value for the blast analysis, otherwise it will use the default value of: --- . 
+If -eval (evalue) flag is set the user can specify a value for the blast analysis, otherwise it will use the default value of: 10 . 
 
 `python blastnet.py mySequences.fasta -n -eval “1E-10”` 
 
