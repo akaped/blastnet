@@ -7,6 +7,8 @@ The network graphs are in intermediate step to a network graph analysis that all
 This script is for bioinformaticians that want to visualise their sequence data by similarities.
 BLAST is known as "basic local alignment search tool" it allows to search a database of sequences with a query and outputs all the sequences that are similar to it in terms of nucleotide/aminoacid sequence.
 
+Graphs are mathematical structures used to study pairwise relationships between objects and entities.
+Graphs provide a better way of dealing with abstract concepts like relationships and interactions. They also offer an intuitively visual way of thinking about these concepts (extracted from. https://www.analyticsvidhya.com/blog/2018/04/introduction-to-graph-theory-network-analysis-python-codes/ ).
 
 ## Conceptual Pipeline:
 1. mySequences (collection of my sequences in FASTA format)
