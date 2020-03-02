@@ -1,0 +1,2 @@
+THis are not the original binaries of BLAST. Do not use them to run the analysis if you don't know what you are doing.
+THis are modified binaries of BLAST that implement the PARNASSUS scoring system. 
