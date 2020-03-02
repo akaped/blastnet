@@ -76,7 +76,7 @@ def checkinput(args):
         print("PARNASSUS binaries activated - using blastp")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
-        cmd = "." + path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62'
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62'
     if path.isfile(args.ifile):
         print("* Input file selected: {}".format(args.ifile))
         fp = path.abspath(args.ifile) #set full file path for input file
@@ -99,8 +99,7 @@ def checkinput(args):
             print("* Database: NOT DETECTED -- I will generate it")
             makedb(fp,fn,runp,magicletter)
         cmd = cmd.format(runp,fn,fp,rp,fn,evalue)
-        print(cmd)
-
+        #print(cmd)
         return(fp,cmd,db,fn,runp,rp)
     else:
         print("Wrong path for your file, please check your input")
