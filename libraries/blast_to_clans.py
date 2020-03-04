@@ -16,8 +16,11 @@
 import csv
 import sys
 from math import exp
-from os import path 
+from os import path
 
+use_pval = True;
+# set on false if you want to use eval instead
+# maybe clans needs this eval... while Gephi needs pval
 
 text = """
 sequences={0}
@@ -47,7 +50,7 @@ avgfoldchange=false
 colorcutoffs=0.0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9;
 colorarr=(230;230;230):(207;207;207):(184;184;184):(161;161;161):(138;138;138):(115;115;115):(92;92;92):(69;69;69):(46;46;46):(23;23;23):
 </param>
-<seq> 
+<seq>
 {2}
 </seq>
 
@@ -92,14 +95,16 @@ def generateClans(inputfile):
                 pos1 = r[1]
             if r[0] == row[1]:
                 pos2 = r[1]
-        textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[2]))
+        if use_pval: #decide if want to use pval or eval by setting var use_pval
+            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[2]))
+        else:
+            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,row[2])
     print(textContacts)
     print("done creating connections")
 
-    of = path.abspath(inputfile).split(".")[0] 
+    of = path.abspath(inputfile).split(".")[0]
     fn = open("{}.clans".format(of),"w")
     fn.write(text.format(count,pvalue,textSeq,textContacts))
     fn.close()
 
     print("DONE - Generating CLANS file")
-    

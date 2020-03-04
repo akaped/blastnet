@@ -3,7 +3,6 @@ from shutil import copyfile
 from os import path, mkdir, system
 from libraries.network import generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
 from libraries.blast_to_clans import generateClans
-import sys
 
 def banner():
     print("""
@@ -52,9 +51,9 @@ def checkinput(args):
     evalue = ""
 
     if args.e:
-        evalue = ""
+        evalue = args.e
     else:
-        evalue = "10"
+        evalue = "1"
     if args.parnassus and args.n:
         print("You cant use the n flag while using parnassus")
         exit()
@@ -100,7 +99,7 @@ def checkinput(args):
             makedb(fp,fn,runp,magicletter)
         cmd = cmd.format(runp,fn,fp,rp,fn,evalue)
         #print(cmd)
-        return(fp,cmd,db,fn,runp,rp)
+        return(fp,cmd,db,fn,runp,rp,evalue)
     else:
         print("Wrong path for your file, please check your input")
         exit()
@@ -131,7 +130,7 @@ if __name__ == "__main__":
     system("clear")
     banner()
     args = parsearg()
-    fp,cmd,db,fn,runp,rp = checkinput(args)
+    fp,cmd,db,fn,runp,rp,evalue = checkinput(args)
     blastit(cmd)
     bf = rp + "/" + fn + ".tsv" #blast file
     generateNetwork(bf)
