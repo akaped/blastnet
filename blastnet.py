@@ -48,12 +48,13 @@ def checkinput(args):
     dp = "" # dir path
     rp = "" # result path
     runp = "" # runfiles path
-    evalue = ""
+    evalue = "10"
+    cpu = 1
 
     if args.e:
-        evalue = args.e 
-    else:
-        evalue = "10" # This is important for Bladerunner. Since It needs to calculate a ROC curve.
+        evalue = args.e
+    if args.cpu:
+        cpu = args.cpu
     if args.parnassus and args.n:
         print("You cant use the n flag while using parnassus")
         exit()
@@ -66,16 +67,16 @@ def checkinput(args):
     elif args.n and not args.p:
         print("* Selected search: NUCLEOTIDE SEARCH - evalue:{}".format(evalue))
         magicletter = "n"
-        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {}'
+        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -num_threads {}'
     elif not args.n and args.p and not args.parnassus:
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
-        cmd = 'blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62'
+        cmd = 'blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     elif not args.n and args.parnassus:
         print("PARNASSUS binaries activated - using blastp")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
-        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62'
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     if path.isfile(args.ifile):
         print("* Input file selected: {}".format(args.ifile))
         fp = path.abspath(args.ifile) #set full file path for input file
@@ -97,7 +98,7 @@ def checkinput(args):
         else:
             print("* Database: NOT DETECTED -- I will generate it")
             makedb(fp,fn,runp,magicletter)
-        cmd = cmd.format(runp,fn,fp,rp,fn,evalue)
+        cmd = cmd.format(runp,fn,fp,rp,fn,evalue,cpu)
         #print(cmd)
         return(fp,cmd,db,fn,runp,rp,evalue)
     else:
@@ -119,11 +120,10 @@ def parsearg():
     parser.add_argument('-p', action="store_true",help="set the script to run BLASTP")
     parser.add_argument('-e', action="store", type=float, help='evalue for blast run')
     parser.add_argument('-parnassus', action="store_true", help="uses alternate BLAST binaries for PARNASSUS analysis")
+    parser.add_argument('-cpu', type=int, help='number of threads to run - good for cluster computers')
 
     args = parser.parse_args()
     return args
-
-
 
 
 if __name__ == "__main__":
