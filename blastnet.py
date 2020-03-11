@@ -51,9 +51,9 @@ def checkinput(args):
     evalue = ""
 
     if args.e:
-        evalue = args.e
+        evalue = args.e 
     else:
-        evalue = "1"
+        evalue = "10" # This is important for Bladerunner. Since It needs to calculate a ROC curve.
     if args.parnassus and args.n:
         print("You cant use the n flag while using parnassus")
         exit()
