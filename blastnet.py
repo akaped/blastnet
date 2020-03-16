@@ -3,6 +3,7 @@ from shutil import copyfile
 from os import path, mkdir, system
 from libraries.network import generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
 from libraries.blast_to_clans import generateClans
+from libraries.seqcounter import seqcounter
 
 def banner():
     print("""
@@ -57,7 +58,8 @@ def checkinput(args):
     runp = "" # runfiles path
     evalue = "10"
     cpu = 1
-
+    magicletter = ""
+    blastype = ""
     if args.e:
         evalue = args.e
     if args.cpu:
@@ -68,7 +70,7 @@ def checkinput(args):
     if args.n and args.p:
         print("You can't run the script setting two flags, choose if you want to run blastp (-p) or blastn (-n)")
         exit()
-    elif not args.n and not args.p and not args.parnassus:
+    elif not args.n and not args.p and not args.parnassus and not args.counter:
         print("You should set the -p or -n flag, choose if you want to run blastp (-p) or blastn (-n)")
         exit()
     elif args.n and not args.p:
@@ -105,9 +107,11 @@ def checkinput(args):
         db = runp + "/{0}db.{1}hr".format(fn,magicletter)  #same here, shame on you #check if this is the file
         if path.isfile(db):
             print("* Database: DETECTED")
-        else:
+        elif args.n or args.p or args.parnassus:
             print("* Database: NOT DETECTED -- I will generate it")
             makedb(fp,fn,runp,magicletter)
+        else:
+            print("I'm not generating the Db since it is not required")
         cmd = cmd.format(runp,fn,fp,rp,evalue,cpu)
         fn = blastype
         #print(cmd)
@@ -134,6 +138,7 @@ def parsearg():
     parser.add_argument('-cpu', type=int, help='number of threads to run - good for cluster computers')
     parser.add_argument('-graphonly', action="store_true", help="The script will receive as input the tsv file and process only the graphs")
     parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")
+    parser.add_argument('-counter', action="store_true", help="Counts number of seq per family and generates a csv file. necessary for bladerunner.py")
 
     args = parser.parse_args()
     return args
@@ -143,8 +148,10 @@ if __name__ == "__main__":
     system("clear")
     banner()
     args = parsearg()
+    fp,cmd,db,fn,runp,rp,evalue = checkinput(args)
+    if args.counter:
+        seqcounter(args.ifile,rp)
     if not args.graphonly:
-        fp,cmd,db,fn,runp,rp,evalue = checkinput(args)
         blastit(cmd)
         bf = rp + "/" + fn + ".tsv" #blast file
     else:
@@ -153,7 +160,7 @@ if __name__ == "__main__":
         else:
             print(f"The file {args.ifile} does't exist on this system")
             exit()
-    if not args.blastonly:
+    if not args.blastonly and not args.counter:
         generateNetwork(bf)
         print("* GEPHI + CYTOSCAPE FILES GENERATED")
         generateClans(bf)
