@@ -20,6 +20,13 @@ def banner():
 
  -----------------------------------------------------------------------------------------------
 
+"""
+"""
+ BUGFIX - results, I advise in saving as blastp.tsv / blastn.tsv
+ Otherwise overwritting of the files. TRY IT ON BLASTN
+
+
+
 """)
 
 
@@ -67,16 +74,19 @@ def checkinput(args):
     elif args.n and not args.p:
         print("* Selected search: NUCLEOTIDE SEARCH - evalue:{}".format(evalue))
         magicletter = "n"
-        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -num_threads {}'
+        blastype = "blastn"
+        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/blastn.tsv -evalue {} -num_threads {}'
     elif not args.n and args.p and not args.parnassus:
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
-        cmd = 'blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
+        blastype = "blastp"
+        cmd = 'blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/blastp.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     elif not args.n and args.parnassus:
         print("PARNASSUS binaries activated - using blastp")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
-        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/{}.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
+        blastype = "blastparna"
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/blastparna.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     if path.isfile(args.ifile):
         print("* Input file selected: {}".format(args.ifile))
         fp = path.abspath(args.ifile) #set full file path for input file
@@ -98,7 +108,8 @@ def checkinput(args):
         else:
             print("* Database: NOT DETECTED -- I will generate it")
             makedb(fp,fn,runp,magicletter)
-        cmd = cmd.format(runp,fn,fp,rp,fn,evalue,cpu)
+        cmd = cmd.format(runp,fn,fp,rp,evalue,cpu)
+        fn = blastype
         #print(cmd)
         return(fp,cmd,db,fn,runp,rp,evalue)
     else:
@@ -121,6 +132,8 @@ def parsearg():
     parser.add_argument('-e', action="store", type=float, help='evalue for blast run')
     parser.add_argument('-parnassus', action="store_true", help="uses alternate BLAST binaries for PARNASSUS analysis")
     parser.add_argument('-cpu', type=int, help='number of threads to run - good for cluster computers')
+    parser.add_argument('-graphonly', action="store_true", help="The script will receive as input the tsv file and process only the graphs")
+    parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")
 
     args = parser.parse_args()
     return args
@@ -130,10 +143,18 @@ if __name__ == "__main__":
     system("clear")
     banner()
     args = parsearg()
-    fp,cmd,db,fn,runp,rp,evalue = checkinput(args)
-    blastit(cmd)
-    bf = rp + "/" + fn + ".tsv" #blast file
-    generateNetwork(bf)
-    print("* GEPHI + CYTOSCAPE FILES GENERATED")
-    generateClans(bf)
-    print("* CLANS FILES GENERATED")
+    if not args.graphonly:
+        fp,cmd,db,fn,runp,rp,evalue = checkinput(args)
+        blastit(cmd)
+        bf = rp + "/" + fn + ".tsv" #blast file
+    else:
+        if path.isfile(args.ifile):
+            bf = args.ifile
+        else:
+            print(f"The file {args.ifile} does't exist on this system")
+            exit()
+    if not args.blastonly:
+        generateNetwork(bf)
+        print("* GEPHI + CYTOSCAPE FILES GENERATED")
+        generateClans(bf)
+        print("* CLANS FILES GENERATED")

@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn import preprocessing
 import networkx as nx
 import matplotlib.pyplot as plt
-import numpy 
+import numpy
 import sys
 from math import exp
 import pickle as pk
@@ -16,7 +16,7 @@ def convert2cytoscapeJSON(G):
     # load all nodes into nodes array
     final = {}
     final["nodes"] = []
-    final["edges"] = [] 
+    final["edges"] = []
     for node in G.nodes():
         nx = {}
         nx["data"] = {}
@@ -41,7 +41,7 @@ def evalToForce(df):
     print(min,max)
     for eval in x:
         force = max - (eval - min)
-        listForces.append(force) 
+        listForces.append(force)
     df['eval'] = listForces
     return df
 
@@ -60,7 +60,7 @@ def evalToForce(df):
 def loadData(inputf):
     df = pd.read_csv(inputf, sep='\t', header=None)
     df.columns = ['node1','node2','eval']
-    print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df)))) 
+    print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
     return df
 
 def removeSelfHit(df):
@@ -75,7 +75,7 @@ def removeSelfHit(df):
         #print(node1,node2)
         if node1 == node2:
           to_drop.append(i)
-        
+
     df = df.drop(df.index[to_drop])
     print("len of the dataframe after cleaning: " + str(len(df)))
     print("Removing Self Hits - Finish")
@@ -119,7 +119,7 @@ def normalize(df):
 def networkxLoad(df):
     print("Loading NetworkX Data  - Start")
     G = nx.Graph()
-    #get unique nodes, add edges and nodes in networkx 
+    #get unique nodes, add edges and nodes in networkx
     nodeList = []
     edgeList = []
     for i in range(len(df)):
@@ -156,11 +156,9 @@ def generateNetwork(inputf):
         df = normalize(df)
         G = networkxLoad(df)
         # write the GML file for Gephi
-        of = path.abspath(inputf).split(".")[0] 
+        of = path.abspath(inputf).split(".")[0]
         nx.write_gml(G,"{}.gml".format(of))
         # write json file for Cytoscape
         fjson = open("{}.cytoscape".format(of),"w")
         fjson.write(convert2cytoscapeJSON(G))
         fjson.close()
-    
-    

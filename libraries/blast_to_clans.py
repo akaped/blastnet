@@ -18,7 +18,7 @@ import sys
 from math import exp
 from os import path
 
-use_pval = True;
+use_pval = False;
 # set on false if you want to use eval instead
 # maybe clans needs this eval... while Gephi needs pval
 
@@ -87,7 +87,7 @@ def generateClans(inputfile):
     f = open(inputfile, 'rt')
     reader = csv.reader(f, delimiter='\t')
     for row in reader:
-        print(row)
+        #print(row)
         pos1 = 0
         pos2 = 0
         for r in listNamePos:
@@ -99,7 +99,7 @@ def generateClans(inputfile):
             textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[2]))
         else:
             textContacts += "{0} {1}:{2}\n".format(pos1,pos2,row[2])
-    print(textContacts)
+    #print(textContacts)
     print("done creating connections")
 
     of = path.abspath(inputfile).split(".")[0]
