@@ -21,13 +21,6 @@ def banner():
 
  -----------------------------------------------------------------------------------------------
 
-"""
-"""
- BUGFIX - results, I advise in saving as blastp.tsv / blastn.tsv
- Otherwise overwritting of the files. TRY IT ON BLASTN
-
-
-
 """)
 
 
@@ -77,7 +70,8 @@ def checkinput(args):
         print("* Selected search: NUCLEOTIDE SEARCH - evalue:{}".format(evalue))
         magicletter = "n"
         blastype = "blastn"
-        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/blastn.tsv -evalue {} -num_threads {}'
+        # -S 1 Sets blast to search only forward sequences and not both ( as + reverse )
+        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/blastn.tsv -evalue {} -num_threads {} -strand plus'
     elif not args.n and args.p and not args.parnassus:
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
