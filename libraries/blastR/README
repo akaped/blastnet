@@ -1,0 +1,43 @@
+README for BlastR package
+
+This folder contains a practical example about how to use the blastR package, the scripts folder and a documentation file.
+
+In order to use blastallR.pl, formatdbR.pl and blastclustR.pl the former installation of the ncbi-blast package is required. 
+BlastR has been tested and proved to be compatible with the ncbi package version 2.2.18 available here: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/2.2.18/  
+In order to use blastR.pl and xdformatR.pl the former installation of AB-Blast package is required.
+You can download AB-Blast obtaining the license that best fits for you (free or with fee costs) here: http://blast.advbiocomp.com/licensing/
+In order to use wublastR.pl the former installation of WU-Blast package is required. WublastR.pl has been tested and proved to be compatible with BLASTP 2.0MP-WashU [04-May-2006] which unfortunately is not supported anymore. However in our hands blastR.pl and wublastR.pl returned roughly identical results. Therefore if you are in the impossibility to use WU-Blast you can as an alternative install AB-Blast.  
+The xdformatR.pl we provide can be used in association both with blastR.pl and wublastR.pl (just mind to specify the proper AB-xdformat or WU-xdformat when you run it).
+
+BlastR package don't require any installation process. Just run the perl scripts which in turn will call either NCBI-Blast, AB-Blast or WU-Blast on your computer.
+
+The scripts provided in blastR package aim to be similar to NCBI-Blast, WU-Blast and AB-Blast in terms of usage. 
+This means that you can pass to blastR scripts the majority of the options that you normally would use for NCBI-Blast, WU-Blast and AB-Blast.
+By default the scripts call Blast with the same gap opening, gap extension and filtering settings used in our benchmark.
+However in this package the default neighborhood word score threshold and the word size differ from the one used in our benchmark. In our hands this change resulted in an increased search speed while returning very close results.
+
+The tag "__rev__" you might find as label on some of your hits indicates that the match has been found on the reverse strand.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

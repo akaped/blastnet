@@ -11,6 +11,7 @@ from math import exp
 import pickle as pk
 import json
 from os import path
+from sys import argv
 
 def convert2cytoscapeJSON(G):
     # load all nodes into nodes array
@@ -58,7 +59,10 @@ def evalToForce(df):
 """
 
 def loadData(inputf):
-    df = pd.read_csv(inputf, sep='\t', header=None)
+    if inputf.endswith(".csv"):
+        df = pd.read_csv(inputf, sep=',', header=None)
+    elif inputf.endswith(".tsv"):
+        df = pd.read_csv(inputf, sep='\t', header=None)
     df.columns = ['node1','node2','eval']
     print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
     return df
@@ -162,3 +166,6 @@ def generateNetwork(inputf):
         fjson = open("{}.cytoscape".format(of),"w")
         fjson.write(convert2cytoscapeJSON(G))
         fjson.close()
+
+if __name__ == "__main__":
+    generateNetwork(argv[1])

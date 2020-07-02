@@ -1,0 +1,99 @@
+TUTORIAL for BlastR package
+
+This tutorial will show you how to use the blastR_package scripts: blastR.pl , blastallR.pl , xdformatR.pl , formatdbR.pl, blastclustR.pl and wublastR.pl. 
+Please add the scripts to your $PATH in order to execute the command lines below listed.
+
+The aim is to search the query file "mir17" against the database file "database/inputDatabase.mfa".
+The database contains nucleotidic sequences in FASTA format. 
+For each sequence header the family name is specified after the underscore (that is "hitName_familyname"). 
+For example a member of the family mir-17 would be indicated as: 
+	CR390304.1/91-169_mir-17 
+In this way it is possible to assess whether the blast hit corresponds to a true positive or a false positive.
+True positive example:
+	AY866338.1/212-295_mir-17       CR390304.1/91-169_mir-17
+False positive example:
+	AY866338.1/212-295_mir-17       L12224.1/171-292_RsmY
+Bear in mind that hits labeled with a final "__rev__" indicate that the match has been found on the reverse strand.
+
+The "database" folder contains the following subfolders (where the formatted databases will be produced): 
+database/ncbi_blastN_format
+database/ncbi_blastR_format
+database/wu_blastN_format
+database/wu_blastR_format
+database/ab_blastN_format
+database/ab_blastR_format
+
+
+
+NCBI-BLASTR TUTORIAL
+- Move to the example directory: 
+	cd <<packagePosition>>/blastR_package_V2.2/example
+
+- Run formatdbR.pl:
+	formatdbR.pl -i database/inputDatabase.mfa -n database/ncbi_blastR_format/db
+
+- Run blastallR.pl (tabular output view):
+	blastallR.pl -p blastr -i mir17 -d database/ncbi_blastR_format/db -m 8
+
+You can compare with the results of a standard ncbi-blastn by doing: 
+	formatdb -i database/inputDatabase.mfa -n database/ncbi_blastN_format/db -p F
+	blastall -p blastn -i mir17 -d database/ncbi_blastN_format/db -m 8
+
+
+WU-BLASTR TUTORIAL
+- Move to the example directory: 
+	cd <<packagePosition>>/blastR_package_V2.2/example
+
+- Run xdformatR:
+	xdformatR.pl -o database/wu_blastR_format/db database/inputDatabase.mfa [-pg xdformat_included_in_wu-blast_package]
+        #TROUBLESHOOTING: If not yet in the path, mind to specify with the parameter "-pg" the xdformat included in wu-blast package
+
+- Run wublastR (tabular output view):	  
+        wublastR.pl database/wu_blastR_format/db mir17 mformat=2 [-pg blastp_included_in_wu-blast_package]
+        #TROUBLESHOOTING: If not yet in the path, mind to specify with the parameter "-pg" the blastp included in wu-blast package
+
+You can compare the results of a standard wu-blastn by doing: 
+	xdformat -n -o database/wu_blastN_format/db database/inputDatabase.mfa
+	blastn database/wu_blastN_format/db mir17 mformat=2
+
+
+AB-BLASTR TUTORIAL
+- Move to the example directory: 
+	cd <<packagePosition>>/blastR_package_V2.2/example
+
+- Run xdformatR:
+	xdformatR.pl -o database/ab_blastR_format/db database/inputDatabase.mfa [-pg xdformat_included_in_ab-blast_package]
+	#TROUBLESHOOTING: If not yet in the path, mind to specify with the parameter "-pg" the xdformat included in ab-blast package
+
+- Run blastR (tabular output view):
+	blastR.pl database/ab_blastR_format/db mir17 mformat=2 [-pg blastp_included_in_ab-blast_package]
+	#TROUBLESHOOTING: If not yet in the path, mind to specify with the parameter "-pg" the blastp included in ab-blast package
+
+You can compare the results of a standard ab-blastn by doing: 
+	xdformat -n -o database/ab_blastN_format/db database/inputDatabase.mfa
+	blastn database/ab_blastN_format/db mir17 mformat=2
+
+
+BLASTCLUSTR TUTORIAL
+- Move to the example directory: 
+	cd <<packagePosition>>/blastR_package_V2.2/example
+- Run blastclustR:
+	blastclustR.pl -i database/inputDatabase.mfa
+
+You can compare the results of a standard blastclust by doing:
+	blastclust -p F -i database/inputDatabase.mfa
+
+
+
+
+##WARNING##
+In order to use blastallR.pl formatdbR.pl and blastclustR.pl the former installation of the ncbi-blast package (ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/) is required.
+In order to use blastR.pl and xdformatR.pl the former installation of either AB-blast (http://blast.advbiocomp.com/licensing/) is required.
+In order to use wublastR.pl the former installation of WU-blast package is required.
+Please add to the command lines the field "-pg programPath" to indicate the program name in your computer in case it is different from default:
+formatdbR   -> default "formatdb"
+blastallR   -> default "blastall"
+xdformatR   -> default "xdformat"
+blastR      -> default "blastp"
+wublastR    -> default "blastp"
+blastclustR -> default "blastclust"

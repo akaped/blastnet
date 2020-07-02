@@ -83,6 +83,12 @@ def checkinput(args):
         magicletter = "p"
         blastype = "blastparna"
         cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/blastparna.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
+    elif not args.n and args.blastr:
+        print("BLASTR binaries acrivated - using blastR")
+        print("* Selected search: BLASTR search - evalue:{}".format(evalue))
+        magicletter = "p"
+        blastype = "blastr"
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/blastR/scripts/blastallR.pl -p blastr -d {}/{}db -i {} -outfmt "6 qseqid sseqid evalue" -o {}/blastr.tsv -e {} -num_threads {}'
     if path.isfile(args.ifile):
         print("* Input file selected: {}".format(args.ifile))
         fp = path.abspath(args.ifile) #set full file path for input file
@@ -129,6 +135,7 @@ def parsearg():
     parser.add_argument('-p', action="store_true",help="set the script to run BLASTP")
     parser.add_argument('-e', action="store", type=float, help='evalue for blast run')
     parser.add_argument('-parnassus', action="store_true", help="uses alternate BLAST binaries for PARNASSUS analysis")
+    parser.add_argument('-blastr', action="store_true", help="uses BlastR pearl scripts to run the analysis")
     parser.add_argument('-cpu', type=int, help='number of threads to run - good for cluster computers')
     parser.add_argument('-graphonly', action="store_true", help="The script will receive as input the tsv file and process only the graphs")
     parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")

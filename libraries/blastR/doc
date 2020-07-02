@@ -1,0 +1,101 @@
+DOCUMENTATION file for the BlastR package
+
+blastclustR.pl: 
+- Clustering script based on BlastClust. This script takes as input nucleotidic multi-FASTA sequences. The sequences can be provided either specifying a file with the -i option (-i fileName) or through the standard input. 
+- It converts the input sequences into di-nucleotidic code (protein-like) producing a temporary file removed at the end of the script. The user can specify where to create this file using the option "-tmp folder" (default is /tmp).       
+- BlastclustR.pl calls blastclust considering the sequences as proteins ("blastclust -p T") and using the BLOSUMR scoring matrix. 
+- When running blastclustR.pl the BLOSUMR scoring matrix is automatically produced in a /tmp subfolder and used by blastclust. The matrix subfolder is removed when the clustering is finished.
+- By default BlastclustR.pl assumes that you call blastclust on your machine by simply stating "blastclust". If this is not the case you must edit the blastclustR.pl command line you use, providing the field -pg with the blastclust path. 
+- By default BlastclustR.pl sets the blastclust parameters that we tested in our benchmark. These are -S 0 -L 0 -c default_configuration_file where the latter conists in a temporary file created in /tmp and removed at the end of the script. This default configuration file indicates the gap opening and gap extension costs -G 6 -E 2 together with an evalue threshold of of 50 (-e 50). 
+- BlastclustR.pl returns on the standard error the command line effectively run and the default configuration file content.
+- BlastclustR.pl offers the same options as blastclust. 
+  Example: 
+
+   blastclustR.pl -i multiFASTAfile -c configurationFile -o outputFile
+
+  ##WARNING##: The option "-S 2" in the configuration file (if any) is not supported.
+  ##WARNING##: Since blastclustR works on protein-like sequences the parameter "-p" is unnecessary and therefore skipped if given in the commandline
+- The flag "-U" allows the lower case filtering. This replaces lower case nucleotides with the ambiguity symbol "X". If a sequence is totally masked (or totally but the last residue) it is skipped.
+- Input sequences and their reverse complement are skipped if shorter than at least twice the specified word size.
+- BlastclustR.pl usage information is provided using the -h (--help) option.
+
+
+formatdbR.pl:    
+- Script to use in order to turn nucleotide FASTA sequences into blastallR.pl databases. The sequences can be provided either specifying a file with the -i option (-i fileName) or through the standard input.	    
+- It converts the input sequences into di-nucleotidic code (protein-like) producing a temporary file removed at the end of the script. The user can specify where to create this file using the option "-tmp folder". By default this file i created in different folder according with the conditions.  This file is created in the local folder (which is also the output directory) if standard input. Otherwise it is created at the input directory path (which is also the output directory). If the user specify with the option "-n" a costumer output name by default the temporary file will be created in /tmp/.
+- Formatdb.pl runs formatdb on the translated protein-like file.     
+- By default formatdbR.pl assumes that you call formatdb on your machine by simply stating "formatdb". If this is not the case you must edit the formatdbR.pl command line you use, providing the field -pg with the blastclust path.
+- FormatdbR.pl offers the same options as formatdb.
+  Example:
+
+  formatdbR.pl -i FASTAfile -n outDatabaseName
+  
+  ##WARNING##: Since formatdbR works on protein-like sequences the parameter "-p" is unnecessary and therefore skipped if given in the commandline 
+- FormatdbR.pl usage information is provided using the -h (--help) option.
+
+
+blastallR.pl:
+- Sequence similarity search tool based on ncbi-blastP. BlastallR.pl allows to compare nucleotide query sequences with a database of nucleotide sequences (formatted using formatdbR.pl).
+- The queries can be provided either specifying a file with the -i option (-i fileName) or through the standard input.
+- BlastallR converts the input sequences into dinucleotide code (protein-like) producing a temporary file removed at the end of the script. The user can specify where to create this file using the option "-tmp folder" (default is /tmp).
+- In order to run blastallR please provide the \"-p blastr\" option. If not, standard blastall will be called.
+- By default blastallR.pl assumes that you call blastall on your machine by simply stating "blastall". If this is not the case you must edit the blastallR.pl command line you use, providing the field -pg with the blastall path.
+- By default blastallR.pl uses as gap opening and gap extension costs respectively -G 6 and -E 2.
+- By default blastallR.pl does not perform any filtering using the option "-F F".
+- By default blastallR.pl does not use neighborhood words for seeding. This is done by considering a non-permissive inclusion threshold (-f 9999999).
+- BlastallR.pl offers the same options as blastall.
+  Example:
+
+  blastallR.pl -p blastr -i queryFile -d database -e expectationValue -m alignmentViewOptions
+
+  ##WARNING##: In order to load the dinucleotide matrix in blastall it is compulsory setting "-V T". This is automatically done by the script. BlastallR.pl will ignore any attempt to set "-V F". 
+- BlastallR.pl usage information is provided using the -h (--help) option. 
+
+
+xdformatR.pl:
+- Script to use in order to turn nucleotide FASTA sequences into AB-Blast or WU-Blast databases.
+- You can run it to format one ore multiple databases at once, using the standard input and/or specifying the input files. If more than one input is specified, a temporary concatenated file will be created in the input file directory.   
+- It converts the input sequences (or the concatenated file) into dinucleotidic code (protein-like) producing a temporary file removed at the end of the script. The user can specify where to create this file using the option "-tmp folder" otherwise by default is is created in the same input folder.
+- XdformatR.pl runs xdformat on the translated protein-like file.
+- By default xdformatR.pl assumes that you call xdformat on your machine by simply stating "xdformat". If this is not the case you must edit the xdformatR.pl command line you use, providing the field -pg with the xdformat path. 
+##TROUBLESHOOTING## Both AB-Blast and WU-Blast packages are provided with their own xdformat. While databases created by WU-xdformat can be searched with AB-Blast, database created by AB-xdformat can not. It is therefore important that the user specifies with -pg option the proper xdformat to use.
+- XdformatR.pl offers the same options as xdformat.
+  Example:
+
+  xdformatR.pl -o xdbname [options] fadb	
+  
+  ##WARNING##: Since xdformatR works on protein-like sequences the parameter [-n|-p] is unnecessary and therefore skipped if given in the commandline. 
+  ##WARNING##: The options: -a -r -i -V -X are not supported.
+- XdformatR.pl usage information is provided using the -h (--help) option. 
+
+
+blastR.pl:
+- Sequence similarity search tool based on AB-blastP. BlastR.pl allows to compare nucleotide query sequences with a database of nucleotide sequences (formatted using xdformatR.pl).
+- BlastR.pl converts the input sequences into dinucleotide code (protein-like) producing a temporary file removed at the end of the script. The user can specify where to create this file using the option "-tmp folder" (default is /tmp).  
+- By default blastR.pl assumes that blastp program name on your computer is just 'blastp'. If this is not the case you must provide the field -pg with the blastp path.
+##TROUBLESHOOTING## Both AB-Blast and WU-Blast packages are provided with their own blastp. If needed it is therefore important that the user properly specifies, with -pg option, the AB/BlastP one.
+- By default blastR.pl uses as gap opening and gap extension costs respectively -Q=10 and -R=10.
+- By default blastR.pl uses a word size of 5. 
+- By default blastR.pl does not use neighborhood words for seeding. This is done by considering a non-permissive inclusion threshold (-T=9999999).
+- Use the usual blastp parameters.
+  Example:
+
+  blastR.pl database queryFile W=7 mformat=2
+
+- BlastR.pl usage information is provided using the -h (--help) option.
+
+
+wublastR.pl:
+- Sequence similarity search tool based on WU-blastP. WublastR.pl allows to compare nucleotide query sequences with a database of nucleotide sequences (formatted using xdformatR.pl).
+- WublastR.pl converts the input sequences into dinucleotide code (protein-like) producing a temporary file removed at the end of the script. The user can specify where to create this file using the option "-tmp folder" (default is /tmp).  
+- By default wublastR.pl assumes that blastp program name on your computer is just 'blastp'. If this is not the case you must provide the field -pg with the blastp path.
+##TROUBLESHOOTING## Both AB-Blast and WU-Blast packages are provided with their own blastp. If needed it is therefore important that the user properly specifies, with -pg option, the WU/BlastP one.
+- By default wublastR.pl uses as gap opening and gap extension costs respectively -Q=10 and -R=10.
+- By default wublastR.pl uses a word size of 5. 
+- By default wublastR.pl does not use neighborhood words for seeding. This is done by considering a non-permissive inclusion threshold (-T=9999999).
+- Use the usual blastp parameters.
+  Example:
+
+  wublastR.pl database queryFile W=7 mformat=2
+
+- WublastR.pl usage information is provided using the -h (--help) option.
