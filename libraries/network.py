@@ -12,6 +12,7 @@ import pickle as pk
 import json
 from os import path
 from sys import argv
+from filter_by_evalue import filterevalue
 
 def convert2cytoscapeJSON(G):
     # load all nodes into nodes array
@@ -35,11 +36,12 @@ def convert2cytoscapeJSON(G):
     return json.dumps(final)
 
 def evalToForce(df):
+    print("Converting Evalues to Forces")
     x = df['eval'].values
     listForces = []
     min = numpy.amin(x)
     max = numpy.amax(x)
-    print(min,max)
+    print(f"Min Evalue {min}, Max Evalue {max}")
     for eval in x:
         force = max - (eval - min)
         listForces.append(force)
@@ -142,9 +144,11 @@ def networkxLoad(df):
     return G
 
 
-def generateNetwork(inputf):
+def generateNetwork(inputf,evalue=0):
     expname = inputf.split(".")[0]
     df = loadData(inputf)
+    if evalue != 0:
+        df = filterevalue(df,evalue)
     df = removeSelfHit(df)
     if len(df) == 0:
         print("Lenght of the dataset after cleaning = 0 - I can't generate the gephy/cytoscape network")
@@ -168,4 +172,4 @@ def generateNetwork(inputf):
         fjson.close()
 
 if __name__ == "__main__":
-    generateNetwork(argv[1])
+    generateNetwork(argv[1],float(argv[2]))
