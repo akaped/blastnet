@@ -156,8 +156,8 @@ if __name__ == "__main__":
         blastit(cmd)
         bf = rp + "/" + fn + ".tsv" #blast file
     else:
-        if path.isfile(args.ifile):
-            bf = args.ifile
+        if path.isfile(rp + "/" + fn + ".tsv"):
+            bf = rp + "/" + fn + ".tsv"
         else:
             print(f"The file {args.ifile} does't exist on this system")
             exit()
