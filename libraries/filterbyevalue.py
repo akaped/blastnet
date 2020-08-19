@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 #takes as input a csv or tsv file, and a evalue cutoff, loads the data in pandas and fiters the dataframe by this value.
 #writes a clean csv/tsv file. If imported as library is able to take as input a pandas df and return a clean pandas df
 import pandas as pd
