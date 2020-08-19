@@ -66,7 +66,7 @@ def loadData(inputf):
     elif inputf.endswith(".tsv"):
         df = pd.read_csv(inputf, sep='\t', header=None)
     else:
-        print("File not valid")
+        print(f"File {inputf} not valid")
         exit()
     df.columns = ['node1','node2','eval']
     print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
