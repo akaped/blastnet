@@ -1,7 +1,7 @@
 import argparse
 from shutil import copyfile
 from os import path, mkdir, system
-from libraries.network import generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
+from libraries.network import *#generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
 from libraries.blast_to_clans import generateClans
 from libraries.seqcounter import seqcounter
 
