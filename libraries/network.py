@@ -12,7 +12,7 @@ import pickle as pk
 import json
 from os import path
 from sys import argv
-from filter_by_evalue import filterevalue
+from filterbyevalue import filterevalue
 
 def convert2cytoscapeJSON(G):
     # load all nodes into nodes array
