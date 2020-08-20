@@ -19,6 +19,7 @@ def banner():
  Author: Pietro Boccaletto 2020.
  Licence: MIT
 
+ This BlastNet version has been tested with NCBI Blast 2.9+.
  -----------------------------------------------------------------------------------------------
 
 """)
@@ -33,6 +34,8 @@ def makedb(fp,fn,runp,magicletter):
             cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype nucl ".format(fp,runp,fn)
         elif magicletter == "p":
             cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype prot ".format(fp,runp,fn)
+        elif magicletter == "pa":
+            cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype prot -blastdb_version 4".format(fp,runp,fn)
         system(cmd)
         print("GENERATING DB - END\n")
     except:
@@ -80,7 +83,7 @@ def checkinput(args):
     elif not args.n and args.parnassus:
         print("PARNASSUS binaries activated - using blastp")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
-        magicletter = "p"
+        magicletter = "par"
         blastype = "blastparna"
         cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/blastparna.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     elif not args.n and args.blastr:
