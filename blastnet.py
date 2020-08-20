@@ -19,14 +19,13 @@ def banner():
  An automated tool to perform Network Graph Analysis of proteic and nucleic sequences with BLAST.
  Author: Pietro Boccaletto 2020.
  Licence: MIT
-
- This BlastNet version has been tested with NCBI Blast 2.9+.
  -----------------------------------------------------------------------------------------------
 
 """)
 
 def checkNCBIblastversion():
     version = str(subprocess.check_output(['blastn', '-version']))[10:16]
+    print(f"You are using v{version} of NCBI Blast package")
     v1,v2,v3 = version.split(".")
     supportedv1 = ["2"]
     supportedv2 = ["9","10"]
