@@ -4,6 +4,7 @@ from os import path, mkdir, system
 from libraries.network import *#generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
 from libraries.blast_to_clans import generateClans
 from libraries.seqcounter import seqcounter
+import subprocess
 
 def banner():
     print("""
@@ -24,8 +25,15 @@ def banner():
 
 """)
 
-
-
+def checkNCBIblastversion():
+    text = str(subprocess.check_output(['blastn', '-version']))[10:13]
+    supported = ["2.9","2.10"]
+    if text not in supported:
+        print(f"Your version of NCBI Blast {text}+ is not supported")
+        print("The following versions are compatible with this script:")
+        for i in supported:
+            print(i)
+        exit()
 
 def makedb(fp,fn,runp,magicletter):
     try:
@@ -148,6 +156,7 @@ def parsearg():
     parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")
     parser.add_argument('-counter', action="store_true", help="Counts number of seq per family and generates a csv file. necessary for bladerunner.py")
     parser.add_argument('-clans_use_eval', action="store_false", help="Normally pval is used to generate the CLANS output file, set this to switch to evalue")
+    parser.add_argument('-force_execution', action="store_true", help="Allows blastnet to be run with not supported/tested NCBI blast+")
     args = parser.parse_args()
     return args
 
@@ -156,6 +165,8 @@ if __name__ == "__main__":
     system("clear")
     banner()
     args = parsearg()
+    if not args.force_execution:
+        checkNCBIblastversion()
     fp,cmd,db,fn,runp,rp,evalue,bt = checkinput(args)
     if args.counter:
         seqcounter(args.ifile,rp)
