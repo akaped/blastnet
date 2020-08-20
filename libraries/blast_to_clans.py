@@ -11,16 +11,14 @@
 """ conversion formula = Pvalue = 1-e^(-Evalue )"""
 """ pay attention ! pvalue and evalue are almost identical when evalue < 0.01 !!! """
 
-
-
 import csv
 import sys
 from math import exp
 from os import path
 
-use_pval = False;
+#use_pval = True;
 # set on false if you want to use eval instead
-# maybe clans needs this eval... while Gephi needs pval
+# maybe clans needs pval! So set it to true!
 
 text = """
 sequences={0}
@@ -63,7 +61,7 @@ def cal_pvalue(evalue):
     pvalue = 1-(1/exp(float(evalue)))
     return pvalue
 
-def generateClans(inputfile):
+def generateClans(inputfile,use_pval):
     pvalue="1.0E-15"
     f = open(inputfile, 'rt')
     reader = csv.reader(f, delimiter='\t')
@@ -87,18 +85,17 @@ def generateClans(inputfile):
     f = open(inputfile, 'rt')
     reader = csv.reader(f, delimiter='\t')
     for row in reader:
-        #print(row)
         pos1 = 0
         pos2 = 0
         for r in listNamePos:
             if r[0] == row[0]:
                 pos1 = r[1]
-            if r[0] == row[1]:
+            if r[0] == row[5]:
                 pos2 = r[1]
         if use_pval: #decide if want to use pval or eval by setting var use_pval
-            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[2]))
+            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[6]))
         else:
-            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,row[2])
+            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,row[6])
     #print(textContacts)
     print("done creating connections")
 

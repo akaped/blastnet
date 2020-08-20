@@ -68,7 +68,8 @@ def loadData(inputf):
     else:
         print(f"File {inputf} not valid")
         exit()
-    df.columns = ['node1','node2','eval']
+    df.columns = ["node1","qstart","qend","qlen","qseq","node2","eval","pident","bitscore","sstart","send","slen","length","sseq"]
+    df = df.drop(columns=["qend","qstart","qlen","qseq","pident","bitscore","sstart","send","slen","length","sseq"])
     print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
     return df
 
@@ -154,12 +155,12 @@ def generateNetwork(inputf,evalue=0):
         df = filterevalue(df,evalue)
     df = removeSelfHit(df)
     if len(df) == 0:
-        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephy/cytoscape network")
+        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephi/cytoscape network")
         pass
     else:
         df = removeDuplicates(df)
     if len(df) == 0:
-        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephy/cytoscape network")
+        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephi/cytoscape network")
         pass
     else:
         #df = mergeHits(df)
@@ -168,7 +169,8 @@ def generateNetwork(inputf,evalue=0):
         G = networkxLoad(df)
         # write the GML file for Gephi
         of = path.abspath(inputf).split(".")[0]
-        nx.write_gml(G,"{}.gml".format(of))
+        print(of)
+        nx.write_gml(G,f"{of}.gml")
         # write json file for Cytoscape
         fjson = open("{}.cytoscape".format(of),"w")
         fjson.write(convert2cytoscapeJSON(G))

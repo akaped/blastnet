@@ -11,7 +11,8 @@ def loadData(file):
         df = pd.read_csv(file, sep=',', header=None)
     elif file.endswith(".tsv"):
         df = pd.read_csv(file, sep='\t', header=None)
-    df.columns = ['node1','node2','eval']
+    df.columns = ["node1","qstart","qend","qlen","qseq","node2","eval","pident","bitscore","sstart","send","slen","length","sseq"]
+    df = df.drop(columns=["qend","qstart","qlen","qseq","pident","bitscore","sstart","send","slen","length","sseq"])
     print(df)
     return df
 

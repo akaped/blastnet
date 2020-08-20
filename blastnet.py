@@ -52,10 +52,16 @@ def checkinput(args):
     dp = "" # dir path
     rp = "" # result path
     runp = "" # runfiles path
-    evalue = "10"
+    evalue = "1"
     cpu = 1
     magicletter = ""
     blastype = ""
+    if args.ifile:
+        fp = path.abspath(args.ifile) #set full file path for input file
+        fn = path.basename(fp).split(".")[0] # get filename
+    else:
+        print("No input file")
+        exit()
     if args.e:
         evalue = args.e
     if args.cpu:
@@ -74,28 +80,26 @@ def checkinput(args):
         magicletter = "n"
         blastype = "blastn"
         # -S 1 Sets blast to search only forward sequences and not both ( as + reverse )
-        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid sseqid evalue" -out {}/blastn.tsv -evalue {} -num_threads {} -strand plus'
+        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_blastn.tsv -evalue {} -num_threads {} -strand plus'
     elif not args.n and args.p and not args.parnassus:
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
         blastype = "blastp"
-        cmd = 'blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/blastp.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
+        cmd = 'blastp -db {}/{}db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_blastp.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     elif not args.n and args.parnassus:
         print("PARNASSUS binaries activated - using blastp")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "par"
-        blastype = "blastparna"
-        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid sseqid evalue" -out {}/blastparna.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
+        blastype = "parnassus"
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/blastp -db {}/{}db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_parnassus.tsv -evalue {} -matrix BLOSUM62 -num_threads {}'
     elif not args.n and args.blastr:
         print("BLASTR binaries acrivated - using blastR")
         print("* Selected search: BLASTR search - evalue:{}".format(evalue))
         magicletter = "p"
         blastype = "blastr"
-        cmd = path.dirname(path.realpath(__file__)) + '/libraries/blastR/scripts/blastallR.pl -p blastr -d {}/{}db -i {} -outfmt "6 qseqid sseqid evalue" -o {}/blastr.tsv -e {} -num_threads {}'
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/blastR/scripts/blastallR.pl -p blastr -d {}/{}db -i {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -o {}/{}_blastr.tsv -e {} -num_threads {}'
     if path.isfile(args.ifile):
         print("* Input file selected: {}".format(args.ifile))
-        fp = path.abspath(args.ifile) #set full file path for input file
-        fn = path.basename(fp).split(".")[0] # get filename
         if not path.isdir(fn): # if the directory doesnt exist creates it with name as filename
             mkdir(fn)
         dp = path.abspath(fn) # otherwise it exists and we can assign it to dp
@@ -115,10 +119,10 @@ def checkinput(args):
             makedb(fp,fn,runp,magicletter)
         else:
             print("I'm not generating the Db since it is not required")
-        cmd = cmd.format(runp,fn,fp,rp,evalue,cpu)
-        fn = blastype
+        cmd = cmd.format(runp,fn,fp,rp,fn,evalue,cpu)
+        bt = blastype
         #print(cmd)
-        return(fp,cmd,db,fn,runp,rp,evalue)
+        return(fp,cmd,db,fn,runp,rp,evalue,bt)
     else:
         print("Wrong path for your file, please check your input")
         exit()
@@ -143,7 +147,7 @@ def parsearg():
     parser.add_argument('-graphonly', action="store_true", help="The script will receive as input the tsv file and process only the graphs")
     parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")
     parser.add_argument('-counter', action="store_true", help="Counts number of seq per family and generates a csv file. necessary for bladerunner.py")
-
+    parser.add_argument('-clans_use_eval', action="store_false", help="Normally pval is used to generate the CLANS output file, set this to switch to evalue")
     args = parser.parse_args()
     return args
 
@@ -152,20 +156,25 @@ if __name__ == "__main__":
     system("clear")
     banner()
     args = parsearg()
-    fp,cmd,db,fn,runp,rp,evalue = checkinput(args)
+    fp,cmd,db,fn,runp,rp,evalue,bt = checkinput(args)
     if args.counter:
         seqcounter(args.ifile,rp)
     if not args.graphonly:
         blastit(cmd)
-        bf = rp + "/" + fn + ".tsv" #blast file
+        bf = rp + "/" + fn + "_" + bt + ".tsv" #blast file
     else:
-        if path.isfile(rp + "/" + fn + ".tsv"):
-            bf = rp + "/" + fn + ".tsv"
+        if path.isfile(rp + "/" + fn + "_" + bt + ".tsv"):
+            bf = rp + "/" + fn + "_" + bt + ".tsv"
         else:
             print(f"The file {args.ifile} does't exist on this system")
             exit()
     if not args.blastonly and not args.counter:
         generateNetwork(bf)
         print("* GEPHI + CYTOSCAPE FILES GENERATED")
-        generateClans(bf)
+        if args.clans_use_eval:
+            print("Using Eval to generate CLANS input file")
+            generateClans(bf,False)
+        else:
+            print("Using pval to generate CLANS input file")
+            generateClans(bf,True)
         print("* CLANS FILES GENERATED")
