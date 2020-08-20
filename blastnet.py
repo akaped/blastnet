@@ -26,9 +26,11 @@ def banner():
 """)
 
 def checkNCBIblastversion():
-    text = str(subprocess.check_output(['blastn', '-version']))[10:13]
-    supported = ["2.9","2.10"]
-    if text not in supported:
+    version = str(subprocess.check_output(['blastn', '-version']))[10:16]
+    v1,v2,v3 = version.split(".")
+    supportedv1 = ["2"]
+    supportedv2 = ["9","10"]
+    if v1 not in supportedv1 or v2 not in supportedv2:
         print(f"Your version of NCBI Blast {text}+ is not supported")
         print("The following versions are compatible with this script:")
         for i in supported:
