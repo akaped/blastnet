@@ -74,28 +74,31 @@ def generateClans(inputfile,use_pval):
 
     print("creation of list of sequence names.")
     for row in reader:
-        if row[0] not in listName:
-            listName.append(row[0])
-            listNamePos.append([row[0],count])
-            textSeq += ">{}\nX\n".format(row[0])
-            count += 1
+        if row:
+            if row[0] not in listName and not row[0] == "Search has CONVERGED!":
+                listName.append(row[0])
+                listNamePos.append([row[0],count])
+                textSeq += ">{}\nX\n".format(row[0])
+                count += 1
     print("Done name list creation")
 
     print("creation  connections")
     f = open(inputfile, 'rt')
     reader = csv.reader(f, delimiter='\t')
     for row in reader:
-        pos1 = 0
-        pos2 = 0
-        for r in listNamePos:
-            if r[0] == row[0]:
-                pos1 = r[1]
-            if r[0] == row[5]:
-                pos2 = r[1]
-        if use_pval: #decide if want to use pval or eval by setting var use_pval
-            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[6]))
-        else:
-            textContacts += "{0} {1}:{2}\n".format(pos1,pos2,row[6])
+        if row:
+            if not row[0] == "Search has CONVERGED!":
+                pos1 = 0
+                pos2 = 0
+                for r in listNamePos:
+                    if r[0] == row[0]:
+                        pos1 = r[1]
+                    if r[0] == row[5]:
+                        pos2 = r[1]
+                if use_pval: #decide if want to use pval or eval by setting var use_pval
+                    textContacts += "{0} {1}:{2}\n".format(pos1,pos2,cal_pvalue(row[6]))
+                else:
+                    textContacts += "{0} {1}:{2}\n".format(pos1,pos2,row[6])
     #print(textContacts)
     print("done creating connections")
 
