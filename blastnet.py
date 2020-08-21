@@ -1,7 +1,7 @@
 import argparse
 from shutil import copyfile
 from os import path, mkdir, system
-from libraries.network import *#generateNetwork # import the required files to generate a cytoscape file that can be imported in gephi
+from libraries.network import generateNetwork# import the required files to generate a cytoscape file that can be imported in gephi
 from libraries.blast_to_clans import generateClans
 from libraries.seqcounter import seqcounter
 import subprocess
@@ -124,7 +124,7 @@ def checkinput(args):
         blastype = "psiblast"
         cmd = 'psiblast -db {}/{}db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_psiblast.tsv -evalue {} -matrix ' + matrix + ' -max_target_seqs ' + max_target_seqs + ' -num_iterations ' + num_iterations + ' -inclusion_ethresh ' + inclusion_ethresh + ' -num_threads {} -max_hsps 1 -comp_based_stats ' + comp_based_stats
     elif not args.n and args.parnassus:
-        print("PARNASSUS binaries activated - using blastp")
+        print("PARNASSUS binaries activated - using psiblast")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "par"
         blastype = "parnassus"
@@ -220,8 +220,8 @@ if __name__ == "__main__":
         print("* GEPHI + CYTOSCAPE FILES GENERATED")
         if args.clans_use_eval:
             print("Using Eval to generate CLANS input file")
-            generateClans(bf,False)
+            generateClans(bf,args.ifile,False)
         else:
             print("Using pval to generate CLANS input file")
-            generateClans(bf,True)
+            generateClans(bf,args.ifile,True)
         print("* CLANS FILES GENERATED")

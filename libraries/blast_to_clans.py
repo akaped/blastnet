@@ -15,6 +15,7 @@ import csv
 import sys
 from math import exp
 from os import path
+from Bio import SeqIO
 
 #use_pval = True;
 # set on false if you want to use eval instead
@@ -61,9 +62,9 @@ def cal_pvalue(evalue):
     pvalue = 1-(1/exp(float(evalue)))
     return pvalue
 
-def generateClans(inputfile,use_pval):
+def generateClans(blastfile,ifile,use_pval):
     pvalue="1.0E-15"
-    f = open(inputfile, 'rt')
+    f = open(blastfile, 'rt')
     reader = csv.reader(f, delimiter='\t')
     listNamePos = []
     listName = []
@@ -72,18 +73,23 @@ def generateClans(inputfile,use_pval):
     textContacts = ""
     textSeq = ""
 
+    #parsing the input fasta file into a dictionary
+    seq_dict={}
+    for record in SeqIO.parse(ifile,'fasta'):
+        seq_dict[record.id]=str(record.seq)
+
     print("creation of list of sequence names.")
     for row in reader:
         if row:
             if row[0] not in listName and not row[0] == "Search has CONVERGED!":
                 listName.append(row[0])
                 listNamePos.append([row[0],count])
-                textSeq += ">{}\nX\n".format(row[0])
+                textSeq += f">{row[0]}\n{seq_dict[row[0]]}\n"
                 count += 1
     print("Done name list creation")
 
     print("creation  connections")
-    f = open(inputfile, 'rt')
+    f = open(blastfile, 'rt')
     reader = csv.reader(f, delimiter='\t')
     for row in reader:
         if row:
@@ -102,7 +108,7 @@ def generateClans(inputfile,use_pval):
     #print(textContacts)
     print("done creating connections")
 
-    of = path.abspath(inputfile).split(".")[0]
+    of = path.abspath(blastfile).split(".")[0]
     fn = open("{}.clans".format(of),"w")
     fn.write(text.format(count,pvalue,textSeq,textContacts))
     fn.close()
