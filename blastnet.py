@@ -40,9 +40,9 @@ def checkNCBIblastversion():
 def makedb(fp,fn,runp,bt):
     print("GENERATING DB - START")
     if bt == "blastn":
-        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype nucl ".format(fp,runp,fn,bt)
+        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype nucl -blastdb_version 4".format(fp,runp,fn,bt)
     elif bt == "psiblast" or bt == "blastr":
-        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype prot ".format(fp,runp,fn,bt)
+        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype prot -blastdb_version 4".format(fp,runp,fn,bt)
     elif bt == "parnassus":
         cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype prot -blastdb_version 4".format(fp,runp,fn,bt)
     print(f"generating the database with this cmd: {cmd}")
