@@ -29,9 +29,9 @@ def checkNCBIblastversion():
     print(f"You are using v{version} of NCBI Blast package")
     v1,v2,v3 = version.split(".")
     supportedv1 = ["2"]
-    supportedv2 = ["9","10"]
+    supportedv2 = ["8","9","10"]
     if v1 not in supportedv1 or v2 not in supportedv2:
-        print(f"Your version of NCBI Blast {text}+ is not supported")
+        print(f"Your version of NCBI Blast {version}+ is not supported")
         print("The following versions are compatible with this script:")
         for i in supported:
             print(i)
