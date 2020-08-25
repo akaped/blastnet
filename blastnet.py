@@ -185,7 +185,7 @@ def parsearg():
     parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")
     parser.add_argument('-counter', action="store_true", help="Counts number of seq per family and generates a csv file. necessary for bladerunner.py")
     parser.add_argument('-clans_use_eval', action="store_false", help="Normally pval is used to generate the CLANS output file, set this to switch to evalue")
-    parser.add_argument('-force_execution', action="store_true", help="Allows blastnet to be run with not supported/tested NCBI blast+")
+    #parser.add_argument('-force_execution', action="store_true", help="Allows blastnet to be run with not supported/tested NCBI blast+")
     parser.add_argument('-matrix', action="store", help="Specify the type of matrix blast should use. Default: BLOSUM62")
     parser.add_argument('-max_target_seqs', action="store", help="Specify max number of sequences to retain per query. Default: 1000")
     parser.add_argument('-num_iterations', action="store", help="Number of iterations for psiblast. Default: 1")
@@ -199,8 +199,8 @@ if __name__ == "__main__":
     system("clear")
     banner()
     args = parsearg()
-    if not args.force_execution:
-        checkNCBIblastversion()
+    #if not args.force_execution:
+    checkNCBIblastversion()
     fp,cmd,db,fn,runp,rp,evalue,bt = checkinput(args)
     if args.counter:
         seqcounter(args.ifile,rp)
