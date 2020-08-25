@@ -35,22 +35,19 @@ def checkNCBIblastversion():
         print("The following versions are compatible with this script:")
         for i in supported:
             print(i)
-        exit()
+        print("The script will execute anyway but it may generate execution errors.")
 
-def makedb(fp,fn,runp,magicletter):
-    try:
-        print("GENERATING DB - START")
-        if magicletter == "n":
-            cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype nucl ".format(fp,runp,fn)
-        elif magicletter == "p":
-            cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype prot ".format(fp,runp,fn)
-        elif magicletter == "pa":
-            cmd = "makeblastdb -in {0} -out {1}/{2}db -dbtype prot -blastdb_version 4".format(fp,runp,fn)
-        system(cmd)
-        print("GENERATING DB - END\n")
-    except:
-        print("! ERROR WHILE MAKING DB")
-        exit()
+def makedb(fp,fn,runp,bt):
+    print("GENERATING DB - START")
+    if bt == "blastn":
+        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype nucl ".format(fp,runp,fn,bt)
+    elif bt == "psiblast" or bt == "blastr":
+        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype prot ".format(fp,runp,fn,bt)
+    elif bt == "parnassus":
+        cmd = "makeblastdb -in {0} -out {1}/{2}_{3}_db -dbtype prot -blastdb_version 4".format(fp,runp,fn,bt)
+    system(cmd)
+    print("GENERATING DB - END\n")
+
 
 def checkinput(args):
     # runfiles
@@ -126,7 +123,7 @@ def checkinput(args):
     elif not args.n and args.parnassus:
         print("PARNASSUS binaries activated - using psiblast")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
-        magicletter = "par"
+        magicletter = "n"
         blastype = "parnassus"
         cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/psiblast -db {}/{}db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_parnassus.tsv -evalue {} -matrix ' + matrix + ' -max_target_seqs ' + max_target_seqs + ' -num_iterations ' + num_iterations +' -inclusion_ethresh ' + inclusion_ethresh + ' -num_threads {} -max_hsps 1 -comp_based_stats ' + comp_based_stats
     elif not args.n and args.blastr:
@@ -148,20 +145,21 @@ def checkinput(args):
             mkdir(runp)
         copyfile(fp, runp + "/" + path.basename(fp))# this is not elegant and will not work in windows
         fp = runp + "/" + path.basename(fp) # this is not elegant and will not work in windows
-        db = runp + "/{0}db.{1}hr".format(fn,magicletter)  #same here, shame on you #check if this is the file
+        db = runp + "/{0}_{2}_db.{1}hr".format(fn,magicletter,blastype)#same here, shame on you #check if this is the file
         if path.isfile(db):
             print("* Database: DETECTED")
         elif args.n or args.p or args.parnassus:
+            print(path.isfile(db))
+            print(db)
             print("* Database: NOT DETECTED -- I will generate it")
-            makedb(fp,fn,runp,magicletter)
+            makedb(fp,fn,runp,blastype)
         else:
             print("I'm not generating the Db since it is not required")
         cmd = cmd.format(runp,fn,fp,rp,fn,evalue,cpu)
         print("* BLAST COMMAND - This is the blast command I'm running for you:")
         print(cmd)
-        bt = blastype
         #print(cmd)
-        return(fp,cmd,db,fn,runp,rp,evalue,bt)
+        return(fp,cmd,db,fn,runp,rp,evalue,blastype)
     else:
         print("Wrong path for your file, please check your input")
         exit()
@@ -209,12 +207,10 @@ if __name__ == "__main__":
     if not args.graphonly:
         blastit(cmd,bt)
         bf = rp + "/" + fn + "_" + bt + ".tsv" #blast file
-    else:
-        if path.isfile(rp + "/" + fn + "_" + bt + ".tsv"):
-            bf = rp + "/" + fn + "_" + bt + ".tsv"
-        else:
-            print(f"The file {args.ifile} does't exist on this system")
-            exit()
+    if not path.isfile(rp + "/" + fn + "_" + bt + ".tsv"):
+        print(f'The file {rp + "/" + fn + "_" + bt + ".tsv"} does\'t exist on this system')
+        exit()
+
     if not args.blastonly and not args.counter:
         generateNetwork(bf)
         print("* GEPHI + CYTOSCAPE FILES GENERATED")
