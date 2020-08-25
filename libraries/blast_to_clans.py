@@ -16,6 +16,7 @@ import sys
 from math import exp
 from os import path
 from Bio import SeqIO
+from sys import argv
 
 #use_pval = True;
 # set on false if you want to use eval instead
@@ -114,3 +115,15 @@ def generateClans(blastfile,ifile,use_pval):
     fn.close()
 
     print("DONE - Generating CLANS file")
+
+if __name__ == "__main__":
+    try:
+        blastfile = argv[1]
+        fastafile = argv[2]
+    except:
+        print("The script must be used in this way")
+        print("python3 blast_to_clans.py blastoutput.tsv queries.fasta")
+        print("queries.fasta is the original file you used to generate the blast output")
+        print("the output of the script is the same directory of your blastoutput.tsv file")
+        exit()
+    generateClans(blastfile,fastafile,True)

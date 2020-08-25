@@ -149,8 +149,6 @@ def checkinput(args):
         if path.isfile(db):
             print("* Database: DETECTED")
         elif args.n or args.p or args.parnassus:
-            print(path.isfile(db))
-            print(db)
             print("* Database: NOT DETECTED -- I will generate it")
             makedb(fp,fn,runp,blastype)
         else:
