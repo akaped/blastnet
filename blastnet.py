@@ -116,24 +116,24 @@ def checkinput(args):
         magicletter = "n"
         blastype = "blastn"
         # -S 1 Sets blast to search only forward sequences and not both ( as + reverse )
-        cmd = 'blastn -db {}/{}db -query {}  -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_blastn.tsv -evalue {} -max_target_seqs ' + max_target_seqs + ' -num_threads {} -strand plus -max_hsps 1'
+        cmd = 'blastn -db {}/{}_blastn_db -query {}  -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_blastn.tsv -evalue {} -max_target_seqs ' + max_target_seqs + ' -num_threads {} -strand plus -max_hsps 1'
     elif not args.n and args.p and not args.parnassus:
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "p"
         blastype = "psiblast"
-        cmd = 'psiblast -db {}/{}db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_psiblast.tsv -evalue {} -matrix ' + matrix + ' -max_target_seqs ' + max_target_seqs + ' -num_iterations ' + num_iterations + ' -inclusion_ethresh ' + inclusion_ethresh + ' -num_threads {} -max_hsps 1 -comp_based_stats ' + comp_based_stats
+        cmd = 'psiblast -db {}/{}_psiblast_db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_psiblast.tsv -evalue {} -matrix ' + matrix + ' -max_target_seqs ' + max_target_seqs + ' -num_iterations ' + num_iterations + ' -inclusion_ethresh ' + inclusion_ethresh + ' -num_threads {} -max_hsps 1 -comp_based_stats ' + comp_based_stats
     elif not args.n and args.parnassus:
         print("PARNASSUS binaries activated - using psiblast")
         print("* Selected search: PROTEIN SEARCH - evalue:{}".format(evalue))
         magicletter = "n"
         blastype = "parnassus"
-        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/psiblast -db {}/{}db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_parnassus.tsv -evalue {} -matrix ' + matrix + ' -max_target_seqs ' + max_target_seqs + ' -num_iterations ' + num_iterations +' -inclusion_ethresh ' + inclusion_ethresh + ' -num_threads {} -max_hsps 1 -comp_based_stats ' + comp_based_stats
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/parnassus/psiblast -db {}/{}_parnassus_db -query {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -out {}/{}_parnassus.tsv -evalue {} -matrix ' + matrix + ' -max_target_seqs ' + max_target_seqs + ' -num_iterations ' + num_iterations +' -inclusion_ethresh ' + inclusion_ethresh + ' -num_threads {} -max_hsps 1 -comp_based_stats ' + comp_based_stats
     elif not args.n and args.blastr:
         print("BLASTR binaries acrivated - using blastR")
         print("* Selected search: BLASTR search - evalue:{}".format(evalue))
         magicletter = "p"
         blastype = "blastr"
-        cmd = path.dirname(path.realpath(__file__)) + '/libraries/blastR/scripts/blastallR.pl -p blastr -d {}/{}db -i {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -o {}/{}_blastr.tsv -e {} -num_threads {} -max_hsps 1'
+        cmd = path.dirname(path.realpath(__file__)) + '/libraries/blastR/scripts/blastallR.pl -p blastr -d {}/{}_blastr_db -i {} -outfmt "6 qseqid qstart qend qlen qseq sseqid evalue pident bitscore sstart send slen length sseq" -o {}/{}_blastr.tsv -e {} -num_threads {} -max_hsps 1'
     if path.isfile(args.ifile):
         print("* Input file selected: {}".format(args.ifile))
         if not path.isdir(fn): # if the directory doesnt exist creates it with name as filename
