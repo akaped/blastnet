@@ -1,10 +1,13 @@
 import argparse
 from shutil import copyfile
-from os import path, mkdir, system
+from os import path, mkdir, system, listdir
 from libraries.network import generateNetwork# import the required files to generate a cytoscape file that can be imported in gephi
 from libraries.blast_to_clans import generateClans
 from libraries.seqcounter import seqcounter
+from Bio import SeqIO
+import multiprocessing as mp
 import subprocess
+
 
 def banner():
     print("""
@@ -49,6 +52,20 @@ def makedb(fp,fn,runp,bt):
     system(cmd)
 
     print("GENERATING DB - END\n")
+
+
+def blastit(cmd,bt,file,rpblastout,rpblastin):
+    try:
+        #print(f"* Running {bt.upper()}")
+        #print("* BLAST COMMAND - This is the blast command I'm running for you:")
+        cmd = cmd.replace("replace_me_in",path.join(rpblastin,file))
+        cmd = cmd.replace("replace_me_out",file.rsplit(".",1)[0])
+        #print(cmd)
+        #cmd = cmd.replace("replace_me_in",path_to_file)
+        system(cmd)
+        #print(f"* END {bt.upper()} RUN")
+    except:
+        print(f"! ERROR RUNNING {bt.upper()}")
 
 
 def checkinput(args):
@@ -145,6 +162,23 @@ def checkinput(args):
         runp = dp + "/runfiles"
         if not path.isdir(runp):
             mkdir(runp)
+        rpblastout = rp + "/blast_output"
+        if not path.isdir(rpblastout):
+            mkdir(rpblastout)
+        rpblastin = runp + "/blast_queries"
+        if not path.isdir(rpblastin):
+            mkdir(rpblastin)
+        if len(listdir(rpblastin)) == 0:
+            print(f"Generating Single Query Files - saved in {rpblastin}")
+            for record in SeqIO.parse(fp, "fasta"):
+                #SeqIO.write(record, "example.fasta", "fasta")
+                #with open
+                temp_record = record.id.replace("/","_")
+                SeqIO.write(record,path.join(rpblastin,temp_record)+".fasta", "fasta")
+        else:
+            print(f"Queries already present in {rpblastin}")
+
+
         copyfile(fp, runp + "/" + path.basename(fp))# this is not elegant and will not work in windows
         fp = runp + "/" + path.basename(fp) # this is not elegant and will not work in windows
         db = runp + "/{0}_{2}_db.{1}hr".format(fn,magicletter,blastype)#same here, shame on you #check if this is the file
@@ -155,22 +189,13 @@ def checkinput(args):
             makedb(fp,fn,runp,blastype)
         else:
             print("I'm not generating the Db since it is not required")
-        cmd = cmd.format(runp,fn,fp,rp,fn,evalue,cpu)
-        print("* BLAST COMMAND - This is the blast command I'm running for you:")
+        cmd = cmd.format(runp,fn,"replace_me_in",rpblastout,"replace_me_out",evalue,cpu) #fn #using a known string to then replace it in the command
         print(cmd)
-        #print(cmd)
-        return(fp,cmd,db,fn,runp,rp,evalue,blastype)
+        return(fp,cmd,db,fn,runp,rp,evalue,blastype,rpblastout,rpblastin)
     else:
         print("Wrong path for your file, please check your input")
         exit()
 
-def blastit(cmd,bt):
-    try:
-        print(f"* Running {bt.upper()}")
-        system(cmd)
-        print(f"* END {bt.upper()} RUN")
-    except:
-        print(f"! ERROR RUNNING {bt.upper()}")
 
 def parsearg():
     parser = argparse.ArgumentParser(description='')
@@ -201,23 +226,33 @@ if __name__ == "__main__":
     args = parsearg()
     #if not args.force_execution:
     checkNCBIblastversion()
-    fp,cmd,db,fn,runp,rp,evalue,bt = checkinput(args)
+    fp,cmd,db,fn,runp,rp,evalue,bt,rpblastout,rpblastin = checkinput(args)
     if args.counter:
         seqcounter(args.ifile,rp)
     if not args.graphonly:
-        blastit(cmd,bt)
-        bf = rp + "/" + fn + "_" + bt + ".tsv" #blast file
-    if not path.isfile(rp + "/" + fn + "_" + bt + ".tsv"):
-        print(f'The file {rp + "/" + fn + "_" + bt + ".tsv"} does\'t exist on this system')
+        pool = mp.Pool(mp.cpu_count())
+        print(mp.cpu_count())
+        files = listdir(rpblastin)
+        n_files = len(rpblastin)
+        count = 0
+        for file in files:
+            count += 1
+            pool.apply_async(blastit, args=(cmd,bt,file,rpblastout,rpblastin))
+        pool.close()
+        pool.join()
+
+    if  listdir(rpblastout) == 0: #check if we have files in the folder.
+        print(f'The folder is empty')
         exit()
 
+
     if not args.blastonly and not args.counter:
-        generateNetwork(bf)
+        generateNetwork(rpblastout)
         print("* GEPHI + CYTOSCAPE FILES GENERATED")
         if args.clans_use_eval:
             print("Using Eval to generate CLANS input file")
-            generateClans(bf,args.ifile,False)
+            generateClans(rpblastout,args.ifile,rp,fn,False)
         else:
             print("Using pval to generate CLANS input file")
-            generateClans(bf,args.ifile,True)
+            generateClans(rpblastout,args.ifile,rp,fn,True)
         print("* CLANS FILES GENERATED")

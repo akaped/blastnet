@@ -10,7 +10,7 @@ import sys
 from math import exp
 import pickle as pk
 import json
-from os import path
+from os import path, listdir
 from sys import argv
 from .filterbyevalue import filterevalue
 
@@ -60,6 +60,7 @@ def evalToForce(df):
     return df
 """
 
+""" deprecated """
 def loadData(inputf):
     if inputf.endswith(".csv"):
         df = pd.read_csv(inputf, sep=',', header=None)
@@ -68,6 +69,24 @@ def loadData(inputf):
     else:
         print(f"File {inputf} not valid")
         exit()
+    df.columns = ["node1","qstart","qend","qlen","qseq","node2","eval","pident","bitscore","sstart","send","slen","length","sseq"]
+    df = df.drop(columns=["qend","qstart","qlen","qseq","pident","bitscore","sstart","send","slen","length","sseq"])
+    print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
+    return df
+
+def loadDir(input):
+    df = pd.DataFrame()
+    print(input)
+    for file in listdir(input):
+        print(input,file)
+        if file.endswith(".csv"):
+            tempdf = pd.read_csv(path.join(input,file), sep=',', header=None)
+        elif file.endswith(".tsv"):
+            tempdf = pd.read_csv(path.join(input,file), sep='\t', header=None)
+        else:
+            print(f"File {input} not valid")
+            exit()
+        df = df.append(tempdf)
     df.columns = ["node1","qstart","qend","qlen","qseq","node2","eval","pident","bitscore","sstart","send","slen","length","sseq"]
     df = df.drop(columns=["qend","qstart","qlen","qseq","pident","bitscore","sstart","send","slen","length","sseq"])
     print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
@@ -148,9 +167,15 @@ def networkxLoad(df):
     return G
 
 
-def generateNetwork(inputf,evalue=0):
-    expname = inputf.split(".")[0]
-    df = loadData(inputf)
+def generateNetwork(input,evalue=0):
+    expname = input.split(".")[0]
+    if path.isfile(input):
+        df = loadData(input)
+    elif path.isdir(input):
+        df = loadDir(input)
+    else:
+        print("input not recognized")
+        exit()
     if evalue != 0:
         df = filterevalue(df,evalue)
     df = removeSelfHit(df)
@@ -168,7 +193,7 @@ def generateNetwork(inputf,evalue=0):
         df = normalize(df)
         G = networkxLoad(df)
         # write the GML file for Gephi
-        of = path.abspath(inputf).split(".")[0]
+        of = path.abspath(input).split(".")[0]
         print(of)
         nx.write_gml(G,f"{of}.gml")
         # write json file for Cytoscape
