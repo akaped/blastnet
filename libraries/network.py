@@ -76,9 +76,9 @@ def loadData(inputf):
 
 def loadDir(input):
     df = pd.DataFrame()
-    print(input)
+    #print(input)
     for file in listdir(input):
-        print(input,file)
+        #print(input,file)
         if file.endswith(".csv"):
             tempdf = pd.read_csv(path.join(input,file), sep=',', header=None)
         elif file.endswith(".tsv"):
@@ -194,7 +194,6 @@ def generateNetwork(input,evalue=0):
         G = networkxLoad(df)
         # write the GML file for Gephi
         of = path.abspath(input).split(".")[0]
-        print(of)
         nx.write_gml(G,f"{of}.gml")
         # write json file for Cytoscape
         fjson = open("{}.cytoscape".format(of),"w")

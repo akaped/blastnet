@@ -89,7 +89,7 @@ def generateClans(blastdir,ifile,rp,fn,use_pval):
                     listNamePos.append([row[0],count])
                     textSeq += f">{row[0]}\n{seq_dict[row[0]]}\n"
                     count += 1
-    print(textSeq)
+    #print(textSeq)
     print("Done name list creation")
 
     print("creation  connections")

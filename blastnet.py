@@ -190,7 +190,7 @@ def checkinput(args):
         else:
             print("I'm not generating the Db since it is not required")
         cmd = cmd.format(runp,fn,"replace_me_in",rpblastout,"replace_me_out",evalue,cpu) #fn #using a known string to then replace it in the command
-        print(cmd)
+        #print(cmd)
         return(fp,cmd,db,fn,runp,rp,evalue,blastype,rpblastout,rpblastin)
     else:
         print("Wrong path for your file, please check your input")
@@ -205,7 +205,7 @@ def parsearg():
     parser.add_argument('-evalue', action="store", help="Cutoff Evalue of the blast search")
     parser.add_argument('-parnassus', action="store_true", help="uses alternate BLAST binaries for PARNASSUS analysis")
     parser.add_argument('-blastr', action="store_true", help="uses BlastR pearl scripts to run the analysis")
-    parser.add_argument('-cpu', type=int, help='number of threads to run - good for cluster computers')
+    #parser.add_argument('-cpu', type=int, help='number of threads to run - good for cluster computers')
     parser.add_argument('-graphonly', action="store_true", help="The script will receive as input the tsv file and process only the graphs")
     parser.add_argument('-blastonly', action="store_true", help="The script will only generate the tsv file, but not process it")
     parser.add_argument('-counter', action="store_true", help="Counts number of seq per family and generates a csv file. necessary for bladerunner.py")
@@ -231,12 +231,11 @@ if __name__ == "__main__":
         seqcounter(args.ifile,rp)
     if not args.graphonly:
         pool = mp.Pool(mp.cpu_count())
-        print(mp.cpu_count())
+        #print(mp.cpu_count())
         files = listdir(rpblastin)
         n_files = len(rpblastin)
-        count = 0
+        print("* Running BLAST ")
         for file in files:
-            count += 1
             pool.apply_async(blastit, args=(cmd,bt,file,rpblastout,rpblastin))
         pool.close()
         pool.join()
