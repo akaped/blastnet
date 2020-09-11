@@ -98,8 +98,10 @@ def checkinput(args):
     """ set blast arguments if specified otherwise default will be used """
     if args.evalue:
         evalue = args.evalue
+    """
     if args.cpu:
         cpu = args.cpu
+    """
     if args.matrix: #ok
         matrix = args.matrix
     if args.max_target_seqs:
