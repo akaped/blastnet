@@ -218,6 +218,7 @@ def parsearg():
     parser.add_argument('-num_iterations', action="store", help="Number of iterations for psiblast. Default: 1")
     parser.add_argument('-inclusion_ethresh', action="store", help="Evalue of the inclusion threashold, this is required to use psiblast with more than one iteration")
     parser.add_argument('-comp_based_stats', action="store", help="Use composition-based statistics: Default 2")
+
     args = parser.parse_args()
     return args
 
