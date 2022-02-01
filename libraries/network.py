@@ -50,6 +50,7 @@ def evalToForce(df):
         force = max - (eval - min)
         listForces.append(force)
     df['eval'] = listForces
+    print('------------------------------')
     return df
 
 # Obsolete, pval is not a good measure
@@ -220,7 +221,7 @@ def removeBigEval(df):
     ''' CHECKED - OK '''
     print("## KEEP ONLY HIT WITH SMALLER EVAL ##")
     df.sort_values('eval')
-    df.drop_duplicates(subset = ['node1', 'node2'], keep="first", inplace=True).reset_index(drop = True)
+    df.drop_duplicates(subset = ['node1', 'node2'], keep="first", inplace=True)
     print("Lenght of the dataframe after KEEP ONLY HIT WITH SMALLER EVAL: " + str(len(df)))
     if len(df) == 0:
         print("ERROR: Lenght of the dataframe = 0 - I can't generate the gephi/cytoscape network")
@@ -240,7 +241,8 @@ def generateNetwork(input, evalue=0, superfam_file_path=""):
         print("input not recognized")
         exit()
     ''' filtering by evalue '''
-    df = filterevalue(df, evalue)
+    if evalue != 0:
+        df = filterevalue(df, evalue)
     ''' remove hits where node1 == node2 '''
     df = removeSelfHit(df)
     ''' remove hits that are duplicates, keeps only the first one '''
@@ -252,7 +254,7 @@ def generateNetwork(input, evalue=0, superfam_file_path=""):
     ''' Transforms to a force, where lower evalue (low value) corresponds
     to biggest attraction (big value)'''
     df = evalToForce(df)
-    ''' normalizes the forces from 0 to 1 '''
+    ''' normalizes the forces in the space from 0 to 1 '''
     df = normalize(df)
     ''' Generates the network, removed the edges that have force value = min normalized force value'''
     G = networkxLoad(df)
