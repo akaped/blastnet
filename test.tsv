@@ -1,0 +1,14 @@
+node1	node2	0.222
+node1	node2	0.400
+node1	node2	9.000
+node2	node1	3.000
+node2	node1	9.000
+node2	node1	9.000
+node2	node1	9.000
+node2	node1	9.000
+node1	node2	0.400
+node1	node2	0.400
+node1	node2	0.400
+node1	node2	0.400
+node1	node1	1
+node2	node2	2
