@@ -6,6 +6,7 @@
 import pandas as pd
 from sys import argv
 
+
 def loadData(file):
     if file.endswith(".csv"):
         df = pd.read_csv(file, sep=',', header=None)
@@ -16,19 +17,23 @@ def loadData(file):
     print(df)
     return df
 
+
 def filterevalue(df,eval):
-    print(f"Filtering by Evalue {str(eval)} - Start")
+    print(f"## FILTER BY EVALUE {eval}")
     to_drop = []
     for i in range(len(df)):
-        node1 = df.iloc[i]['node1']
-        node2 = df.iloc[i]['node2']
         evalu = df.iloc[i]['eval']
-        #print(float(evalu),eval)
-        if float(evalu) > eval:
-          to_drop.append(i)
+        ''' if the evalue of the result is above the indicated one then it is dropped '''
+        if float(evalu) > float(eval):
+            to_drop.append(i)
     df = df.drop(df.index[to_drop])
-    print("len of the dataframe after cleaning: " + str(len(df)))
+    print("Lenght of the dataframe after FILTER BY EVALUE: " + str(len(df)))
+    if len(df) == 0:
+        print("ERROR: Lenght of the dataframe = 0 - I can't generate the gephi/cytoscape network")
+        exit()
+    print('------------------------------')
     return df
+
 
 if __name__ == "__main__":
     if not argv[1] or not argv[0]:

@@ -39,12 +39,13 @@ def convert2cytoscapeJSON(G):
     return json.dumps(final)
 
 def evalToForce(df):
+    print("## EVALUE TO FORCE ##")
     print("Converting Evalues to Forces")
     x = df['eval'].values
     listForces = []
     min = numpy.amin(x)
     max = numpy.amax(x)
-    print(f"Min Evalue {min}, Max Evalue {max}")
+    print(f"Min Force {min}, Max Force {max}")
     for eval in x:
         force = max - (eval - min)
         listForces.append(force)
@@ -98,46 +99,54 @@ def loadDir(input):
     print("CSV loaded into Pandas Dataframe - lenght of dataset : {}".format(str(len(df))))
     return df
 
+
 def removeSelfHit(df):
-    print("Removing Self Hits - Start")
-    """ this function removes the BLAST self hits """
+    print("## REMOVE SELF HITS ##")
+    """ this function removes the BLAST self hits - OK TESTED """
     to_drop = []
-    double_nodes = {}
     for i in range(len(df)):
         node1 = df.iloc[i]['node1']
         node2 = df.iloc[i]['node2']
-        evalu = df.iloc[i]['eval']
-        #print(node1,node2)
-        if node1 == node2:
-          to_drop.append(i)
-
+        if str(node1) == str(node2):
+            to_drop.append(i)
     df = df.drop(df.index[to_drop])
-    print("len of the dataframe after cleaning: " + str(len(df)))
-    print("Removing Self Hits - Finish")
+    print("Lenght of the dataframe after REMOVE SELF HITS: " + str(len(df)))
+    if len(df) == 0:
+        print("ERROR: Lenght of the dataframe = 0 - I can't generate the gephi/cytoscape network")
+        exit()
+    print('------------------------------')
     return(df)
+
 
 def removeDuplicates(df):
-    print("Removing Duplicates - Start")
+    print("## REMOVE DUPLICATES HITS ##")
+    ''' Drop duplicates removes only! full line duplicates ...
+    CHECKED - OK '''
     df.sort_values('node1')
-    df.drop_duplicates(keep=False,inplace=True)
-    print("len of the dataframe after cleaning: " + str(len(df)))
+    df.drop_duplicates(keep="first", inplace=True)
+    print("Lenght of the dataframe after REMOVE DUPLICATE HITS: " + str(len(df)))
     if len(df) == 0:
-        print("NO DATA - QUITTING")
+        print("ERROR: Lenght of the dataframe = 0 - I can't generate the gephi/cytoscape network")
         exit()
-    print("Removing Duplicates - Finish")
+    print('------------------------------')
     return(df)
 
+
 def mergeHits(df):
-    print("Merging values for same node1 and node2 - start")
-    print(df)
-    aggregation_functions = {'eval': 'median',}
-    df_new = df.groupby(df['node1', 'node2']).aggregate(aggregation_functions)
-    print("len of the dataframe after merging: " + str(len(df)))
-    print("Merging - Finish")
-    return(df_new)
+    ''' CHECKED - OK '''
+    print("## MERGE HITS ##")
+    df = df.groupby(['node1','node2'], as_index=False)['eval'].mean()
+    print("Lenght of the dataframe after MERGE HITS: " + str(len(df)))
+    if len(df) == 0:
+        print("ERROR: Lenght of the dataframe = 0 - I can't generate the gephi/cytoscape network")
+        exit()
+    print('------------------------------')
+    return(df)
+
 
 def normalize(df):
-    print("Normalisation - Start")
+    ''' CHECKED - OK '''
+    print("## NORMALIZING EDGES ##")
     """ Normalisation of the column eval """
     x = df['eval']#.values.astype(float)
     x = x.to_frame()
@@ -147,40 +156,47 @@ def normalize(df):
     df_normalized = pd.DataFrame(x_scaled)
     dflist = df_normalized.values
     df['eval'] = dflist
-    print("Normalisation - Finish")
+    print('------------------------------')
     return df
 
 
 def networkxLoad(df):
-    print("Loading NetworkX Data  - Start")
+    ''' CHECKED - OK '''
+    print("## Loading NetworkX DATA ##")
     G = nx.Graph()
     #get unique nodes, add edges and nodes in networkx
     nodeList = []
     edgeList = []
+    min_force = numpy.amin(df['eval'].values)
     for i in range(len(df)):
         node1 = df.iloc[i]['node1']
         node2 = df.iloc[i]['node2']
         eval = df.iloc[i]['eval']
-        if eval == 0:
-            eval = 0.001 # Avoid removal of edges that had the lowest evalue
         if node1 not in nodeList:
             nodeList.append(node1)
         if node2 not in nodeList:
             nodeList.append(node2)
-        edgeList.append((node1, node2, eval))
+        if eval != min_force:
+            ''' remove all the edges that have eval = min evalue '''
+            edgeList.append((node1, node2, eval))
     for n in nodeList:
         G.add_node(n)
     G.add_weighted_edges_from(edgeList)
-    print("Loading NetworkX Data  - Finish")
+    print('------------------------------')
     return G
 
 
-def addSuperFamtoNetwork(G, file):
+def addFamAndSuperFamtoNetwork(G, file):
+    ''' CHECKED - OK '''
+    ''' Allows to add the attribute Family and Superfamily to each node '''
+    print("## ANNOTATING NODES ##")
     with open(file, "r") as f:
         lines = f.readlines()
     fam_superfam = {}
     for line in lines:
-        fam, superfam = line.split("\t")
+        line = line.split("\t")
+        fam = line[0].strip()
+        superfam = line[1].strip()
         fam_superfam[fam] = superfam
     for node in G.nodes():
         # fallira per tutti quelli che non hanno un superfam
@@ -189,13 +205,33 @@ def addSuperFamtoNetwork(G, file):
         try:
             G.nodes[node]['superfamily'] = fam_superfam[node_fam]
         except KeyError:
-            #print(f'{node_fam} not in superfamlist')
+            G.nodes[node]['superfamily'] = "not_assigned"
             pass
+        try:
+            G.nodes[node]['family'] = node_fam
+        except Exception as e:
+            print(e)
+            pass
+    print('------------------------------')
     return G
+
+
+def removeBigEval(df):
+    ''' CHECKED - OK '''
+    print("## KEEP ONLY HIT WITH SMALLER EVAL ##")
+    df.sort_values('eval')
+    df.drop_duplicates(subset = ['node1', 'node2'], keep="first", inplace=True).reset_index(drop = True)
+    print("Lenght of the dataframe after KEEP ONLY HIT WITH SMALLER EVAL: " + str(len(df)))
+    if len(df) == 0:
+        print("ERROR: Lenght of the dataframe = 0 - I can't generate the gephi/cytoscape network")
+        exit()
+    print('------------------------------')
+    return(df)
 
 
 def generateNetwork(input, evalue=0, superfam_file_path=""):
     #expname = input.split(".")[0]
+    ''' Load of files and directories '''
     if path.isfile(input):
         df = loadData(input)
     elif path.isdir(input):
@@ -203,31 +239,33 @@ def generateNetwork(input, evalue=0, superfam_file_path=""):
     else:
         print("input not recognized")
         exit()
-    if evalue != 0:
-        df = filterevalue(df, evalue)
+    ''' filtering by evalue '''
+    df = filterevalue(df, evalue)
+    ''' remove hits where node1 == node2 '''
     df = removeSelfHit(df)
-    if len(df) == 0:
-        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephi/cytoscape network")
-        pass
-    else:
-        df = removeDuplicates(df)
-    if len(df) == 0:
-        print("Lenght of the dataset after cleaning = 0 - I can't generate the gephi/cytoscape network")
-        pass
-    else:
-        #df = mergeHits(df) can't be turned on after removing the duplicates
-        df = evalToForce(df)
-        df = normalize(df)
-        G = networkxLoad(df)
-        if superfam_file_path:
-            G = addSuperFamtoNetwork(G, superfam_file_path)
-        # write the GML file for Gephi
-        of = path.abspath(input).split(".")[0]
-        nx.write_gml(G,f"{of}.gml")
-        # write json file for Cytoscape
-        #fjson = open("{}.cytoscape".format(of),"w")
-        #fjson.write(convert2cytoscapeJSON(G))
-        #fjson.close()
+    ''' remove hits that are duplicates, keeps only the first one '''
+    df = removeDuplicates(df)
+    #''' merge hits by evalue (mean) that have the same node1 node2 name '''
+    #df = mergeHits(df)
+    ''' keeps the hit with the lowest evalue discards the others '''
+    df = removeBigEval(df)
+    ''' Transforms to a force, where lower evalue (low value) corresponds
+    to biggest attraction (big value)'''
+    df = evalToForce(df)
+    ''' normalizes the forces from 0 to 1 '''
+    df = normalize(df)
+    ''' Generates the network, removed the edges that have force value = min normalized force value'''
+    G = networkxLoad(df)
+    if superfam_file_path:
+        G = addFamAndSuperFamtoNetwork(G, superfam_file_path)
+    print("FINAL STAGE --- Writing gml file. Please wait")
+    # write the GML file for Gephi
+    of = path.abspath(input).split(".")[0]
+    nx.write_gml(G,f"{of}.gml")
+    # write json file for Cytoscape
+    #fjson = open("{}.cytoscape".format(of),"w")
+    #fjson.write(convert2cytoscapeJSON(G))
+    #fjson.close()
 
 
 if __name__ == "__main__":
